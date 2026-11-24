@@ -16,19 +16,15 @@
     </div>
     <div class="page-tools">
       <span class="grade"><span data-icon="laptop"></span> Classe de 6e</span>
+      <button class="header-button screen-button" type="button" id="screen-button" aria-label="Agrandir le bureau" title="Agrandir le bureau" aria-controls="missions-panel" aria-expanded="true"><span data-screen-icon data-icon="expand"></span><span data-screen-label>Bureau seul</span></button>
       <button class="header-button" type="button" id="help-button"><span data-icon="help"></span><span>Aide</span></button>
     </div>
   </header>
   <main class="workspace">
     <section class="computer" aria-labelledby="desktop-label">
-      <header class="computer-header">
-        <h2 id="desktop-label"><span data-icon="laptop"></span> Bureau d’entraînement</h2>
-        <button type="button" class="plain-icon screen-button" id="screen-button" aria-label="Agrandir le bureau" title="Agrandir le bureau"><span data-icon="expand"></span></button>
-      </header>
+      <h2 id="desktop-label" class="visually-hidden">Bureau d’entraînement</h2>
+      <div class="wallpaper" aria-hidden="true"></div>
       <div class="desktop" id="desktop">
-        <div class="wallpaper" aria-hidden="true">
-          <div class="wall-grain"></div><div class="wall-ribbon wall-ribbon-back"></div><div class="wall-ribbon wall-ribbon-mid"></div><div class="wall-ribbon wall-ribbon-front"></div><div class="wall-shine"></div>
-        </div>
         <div class="desktop-icons" id="desktop-icons" aria-label="Raccourcis du bureau">
           <button type="button" data-app="files" class="desktop-icon" title="Double-clique pour ouvrir Explorateur">
             <span class="app-tile tile-files" data-icon="files"></span><span>Explorateur</span>
@@ -42,31 +38,51 @@
           <button type="button" data-app="trash" class="desktop-icon" title="Double-clique pour ouvrir Corbeille">
             <span class="app-tile tile-trash" data-icon="trash"></span><span>Corbeille</span>
           </button>
+          <button type="button" data-app="images" class="desktop-icon" title="Double-clique pour ouvrir Photos">
+            <span class="app-tile tile-images" data-icon="image"></span><span>Photos</span>
+          </button>
+          <button type="button" data-app="mail" class="desktop-icon" title="Double-clique pour ouvrir Courriel">
+            <span class="app-tile tile-mail" data-icon="mail"></span><span>Courriel</span>
+          </button>
         </div>
         <div id="window-layer" class="window-layer"></div>
-        <div class="start-menu" id="start-menu" hidden>
-          <strong>Applications</strong>
-          <button type="button" data-app="files"><span class="app-tile tile-files" data-icon="files"></span> Explorateur</button>
-          <button type="button" data-app="editor"><span class="app-tile tile-editor" data-icon="editor"></span> Bloc-notes</button>
-          <button type="button" data-app="mouse"><span class="app-tile tile-mouse" data-icon="mouse"></span> Atelier souris</button>
-          <button type="button" data-app="trash"><span class="app-tile tile-trash" data-icon="trash"></span> Corbeille</button>
+        <div class="start-menu" id="start-menu" role="region" aria-label="Menu Démarrer" hidden>
+          <label class="start-search-field">
+            <span data-icon="search"></span>
+            <span class="visually-hidden">Rechercher une application</span>
+            <input id="start-search" type="text" placeholder="Rechercher une application" autocomplete="off" spellcheck="false">
+          </label>
+          <h3>Applications</h3>
+          <div class="start-apps">
+            <button type="button" data-app="files"><span class="app-tile tile-files" data-icon="files"></span><span>Explorateur</span></button>
+            <button type="button" data-app="editor"><span class="app-tile tile-editor" data-icon="editor"></span><span>Bloc-notes</span></button>
+            <button type="button" data-app="images"><span class="app-tile tile-images" data-icon="image"></span><span>Photos</span></button>
+            <button type="button" data-app="mail"><span class="app-tile tile-mail" data-icon="mail"></span><span>Courriel</span></button>
+            <button type="button" data-app="trash"><span class="app-tile tile-trash" data-icon="trash"></span><span>Corbeille</span></button>
+            <button type="button" data-app="mouse"><span class="app-tile tile-mouse" data-icon="mouse"></span><span>Atelier souris</span></button>
+          </div>
+          <p id="start-empty" class="start-empty" role="status" hidden>Aucune application trouvée.</p>
         </div>
         <div id="toast" class="toast" role="status" hidden></div>
       </div>
       <nav class="taskbar" aria-label="Barre des tâches">
-        <button class="start-button" type="button" id="start-button" aria-expanded="false" aria-controls="start-menu"><span data-icon="grid"></span> Démarrer</button>
+        <button class="start-button" type="button" id="start-button" aria-expanded="false" aria-controls="start-menu"><span class="start-mark" data-icon="logo"></span><span>Démarrer</span></button>
         <span class="taskbar-divider" aria-hidden="true"></span>
-        <div class="task-list" id="task-list"></div>
-        <time id="clock" class="clock" aria-label="Heure locale"></time>
+        <div class="task-list" id="task-list" role="group" aria-label="Applications"></div>
+        <div class="taskbar-clock" title="Date et heure locales">
+          <time id="clock" class="clock" aria-label="Heure locale"></time>
+          <time id="date" class="date"></time>
+        </div>
+        <button class="show-desktop-button" type="button" id="show-desktop-button" aria-label="Afficher le bureau" title="Afficher le bureau" aria-pressed="false"></button>
       </nav>
     </section>
     <aside id="missions-panel" class="missions-panel" aria-labelledby="missions-title">
       <header class="missions-header">
         <div class="missions-header-row">
           <h2 id="missions-title"><span class="missions-mark" data-icon="flag"></span> Tes missions</h2>
-          <span class="mission-count" id="mission-count">0 / 6</span>
+          <span class="mission-count" id="mission-count">0</span>
         </div>
-        <progress id="mission-progress" max="6" value="0" aria-label="Missions réussies"></progress>
+        <progress id="mission-progress" value="0" aria-label="Missions réussies"></progress>
       </header>
       <div id="mission-content" class="mission-content"></div>
       <section class="mission-index" aria-labelledby="mission-index-title">
@@ -84,8 +100,8 @@
     <div class="dialog-title"><h2 id="help-title">Besoin d’aide ?</h2><button type="button" class="plain-icon" data-close-dialog aria-label="Fermer l’aide" title="Fermer l’aide"><span data-icon="close"></span></button></div>
     <ul class="help-tips">
       <li><strong>Sur le bureau</strong><span>Un clic sélectionne une icône. Deux clics rapides l’ouvrent.</span></li>
-      <li><strong>Dans une fenêtre</strong><span>Utilise le bouton − pour réduire la fenêtre, puis clique sur son nom dans la barre des tâches pour la retrouver.</span></li>
-      <li><strong>Pour les missions</strong><span>Clique sur « Voir un indice » si tu bloques. Tes fichiers et ta progression restent sur ce navigateur.</span></li>
+      <li><strong>Dans la barre des tâches</strong><span>Clique sur Démarrer pour chercher une application. Une fenêtre réduite reste accessible par son icône dans la barre du bas.</span></li>
+      <li><strong>Pour les missions</strong><span>Choisis un atelier. Clique sur « Afficher un indice » si tu bloques. Tes fichiers et ta progression restent sur ce navigateur.</span></li>
     </ul>
     <div class="dialog-footer"><button id="reset-button" class="header-button" type="button"><span data-icon="reset"></span> Recommencer le parcours</button></div>
   </dialog>
@@ -96,6 +112,8 @@
   </dialog>
   <noscript><p class="noscript">Active JavaScript dans ton navigateur pour utiliser le bureau et faire les missions.</p></noscript>
   <script>/* SHELL SCRIPT */</script>
+  <script>/* PHOTO DATA */</script>
+  <script>/* MAIL SCRIPT */</script>
   <script>/* CORE SCRIPT */</script>
   <script>/* MISSIONS SCRIPT */</script>
 </body>
