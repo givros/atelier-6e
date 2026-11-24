@@ -1,0 +1,1815 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Un bureau d’entraînement interactif pour apprendre à utiliser un ordinateur en 6e.">
+  <meta name="theme-color" content="#f2f5fa">
+  <title>Déclic OS · Premiers pas sur ordinateur</title>
+  <style>
+:root {
+  color-scheme: light;
+  font-family: Arial, sans-serif;
+  color: #000;
+  background: #eef2f8;
+  --line: #dce4ef;
+  --surface: #fff;
+  --mist: #f2f6ff;
+  --indigo: #293fc7;
+  --indigo-dark: #2435aa;
+  --green: #20a874;
+  --soft-green: #e7f9f0;
+  --shadow: 0 14px 35px #1a337416;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; padding: 0 clamp(16px, 3.1vw, 48px); }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: default; opacity: .48; }
+button:focus-visible, textarea:focus-visible, input:focus-visible {
+  outline: 3px solid #5170ff;
+  outline-offset: 3px;
+}
+button svg, [data-icon] svg { display: block; flex-shrink: 0; }
+[data-icon] { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+[hidden] { display: none !important; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.page-header, .page-footer, .workspace { max-width: 1550px; margin-inline: auto; }
+.page-header { height: 104px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand, .page-tools { display: flex; align-items: center; gap: 14px; }
+.brand-icon {
+  width: 51px; height: 51px; border-radius: 15px; color: #fff;
+  background: linear-gradient(145deg, #536bff, #263ccd 70%); box-shadow: 0 5px 14px #293fc74d;
+}
+.brand h1 { margin: 0; font-size: clamp(1.65rem, 2.25vw, 2.1rem); line-height: 1; letter-spacing: -.07em; }
+.brand h1 span { font-size: .68em; letter-spacing: -.04em; }
+.brand p { margin: 6px 0 0; font-size: .9rem; }
+.grade, .header-button, .plain-icon { display: inline-flex; justify-content: center; align-items: center; gap: 8px; }
+.grade { background: #e1e8fa; border-radius: 100px; padding: 8px 12px; font-size: .87rem; font-weight: 700; }
+.header-button, .plain-icon {
+  padding: 9px 13px; background: #fff; border: 1px solid var(--line); border-radius: 9px;
+  min-height: 38px; font-size: .88rem; font-weight: 700;
+}
+.header-button:hover, .plain-icon:hover { background: #e9efff; border-color: #c5d1f1; }
+.plain-icon { width: 38px; padding: 0; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 350px); gap: 19px; align-items: stretch; }
+.computer, .missions-panel { min-width: 0; background: var(--surface); border: 1px solid #d6dfed; border-radius: 18px; box-shadow: var(--shadow); }
+.computer { display: flex; flex-direction: column; overflow: hidden; min-height: min(690px, calc(100dvh - 155px)); }
+.computer-header { min-height: 53px; padding: 0 13px 0 17px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.computer-header h2 { display: flex; align-items: center; gap: 9px; margin: 0; font-size: .94rem; }
+.screen-button { border-color: transparent; min-height: 34px; width: 34px; }
+.desktop { position: relative; display: flex; flex: 1; isolation: isolate; overflow: hidden; min-height: 520px; background: #1a3b86; }
+.wallpaper { position: absolute; overflow: hidden; inset: 0; z-index: -1; background: radial-gradient(ellipse at 67% 88%, #3c7feb 0%, #234aaa 35%, #122664 76%, #17214a 100%); }
+.wall-grain {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle, #d6e5ff65 .8px, transparent 1.25px) 0 0 / 14px 14px;
+  mask-image: radial-gradient(ellipse at 100% 0%, #000 1%, transparent 55%);
+}
+.wall-ribbon { position: absolute; transform-origin: center; pointer-events: none; }
+.wall-ribbon-back {
+  width: 147%; height: 111%; top: 21%; right: -70%; border-radius: 57% 45% 0 0;
+  transform: rotate(-31deg);
+  background: linear-gradient(154deg, #283d8f 13%, #4a61e9 23%, #a6a7ff 36%, #447bf5 46%, #2a54bf 67%);
+  box-shadow: inset 0 3px 0 #c0cbff52, 0 -2px 0 #718dec61, 0 -14px 80px #000c3c44;
+}
+.wall-ribbon-mid {
+  width: 166%; height: 115%; top: 49%; right: -41%; border-radius: 54% 56% 0 0;
+  transform: rotate(-34deg);
+  background: linear-gradient(154deg, #7c93ff 5%, #c2d2ff 12%, #5286f9 20%, #4064d9 31%, #14265e 61%);
+  box-shadow: inset 0 3px 0 #f6fbff66, 0 -6px 30px #15295b80;
+}
+.wall-ribbon-front {
+  width: 136%; height: 93%; top: 65%; right: -51%; border-radius: 58% 55% 0 0;
+  transform: rotate(-36deg);
+  background: linear-gradient(152deg, #2e61c7 12%, #9fcdff 22%, #698cfe 31%, #2549aa 49%, #182451 72%);
+  box-shadow: inset 0 2px 0 #e1f1ff8c, 0 -18px 56px #1225688c;
+}
+.wall-shine {
+  position: absolute; inset: 0; background: linear-gradient(90deg, #07185747, transparent 26%),
+    radial-gradient(ellipse at 100% 5%, #8ea8fa8c, transparent 48%), radial-gradient(ellipse at 34% 100%, #63b4ff5e, transparent 46%);
+}
+.desktop-icons {
+  position: absolute; z-index: 0; top: 17px; left: 12px; width: 110px; display: grid; gap: 3px;
+  align-content: start; user-select: none;
+}
+.desktop-icon {
+  display: grid; width: 100%; justify-items: center; gap: 7px; padding: 8px 2px 9px;
+  background: transparent; border: 1px solid transparent; border-radius: 12px; color: #fff; font-weight: 700; font-size: .84rem;
+}
+.desktop-icon > span:last-child { text-shadow: 0 1px 4px #071338; }
+.desktop-icon:hover, .desktop-icon.is-selected, .desktop-icon[aria-selected="true"] { background: #e4edff30; border-color: #d1ddff67; }
+.app-tile {
+  width: 55px; height: 53px; border-radius: 14px; box-shadow: inset 0 1px 0 #ffffffb5, 0 5px 12px #08195355;
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.tile-files { color: #583500; background: linear-gradient(145deg, #fff2bf, #ffd26f 82%); }
+.tile-editor { color: #154394; background: linear-gradient(145deg, #f6fdff, #afd7ff 82%); }
+.tile-mouse { color: #114b44; background: linear-gradient(145deg, #ddfff4, #92e9cd 82%); }
+.tile-trash { color: #30236e; background: linear-gradient(145deg, #f9f7ff, #c9bcff 82%); }
+.taskbar {
+  min-height: 57px; display: flex; align-items: center; gap: 12px; padding: 7px 15px;
+  background: #f8faff; border-top: 1px solid #dce4f5;
+}
+.start-button, .task-button {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 39px; padding: 7px 11px;
+  border-radius: 8px; white-space: nowrap; font-size: .86rem; font-weight: 700;
+}
+.start-button { background: #dfe7ff; border: 1px solid #cbd7ff; }
+.start-button:hover, .start-button[aria-expanded="true"] { background: #cbd8ff; }
+.taskbar-divider { width: 1px; height: 25px; flex-shrink: 0; background: #dce4f1; }
+.task-list { display: flex; flex: 1; min-width: 0; align-items: center; gap: 5px; overflow: auto; }
+.task-button { position: relative; background: #eef3ff; border: 1px solid #dce5fc; flex-shrink: 0; }
+.task-button:hover, .task-button.is-active { background: #e1e9ff; border-color: #b9c9f7; }
+.task-button.is-active::after { content: ""; position: absolute; bottom: 1px; width: 16px; height: 2px; left: calc(50% - 8px); border-radius: 4px; background: var(--indigo); }
+.clock { margin-left: auto; font-size: .88rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.start-menu {
+  position: absolute; z-index: 10000; bottom: 8px; left: 10px; width: 242px; padding: 10px;
+  background: #fff; border: 1px solid #d7e2f4; border-radius: 14px; box-shadow: 0 14px 32px #10184754;
+}
+.start-menu strong { display: block; padding: 7px 10px; font-size: .88rem; }
+.start-menu button {
+  display: flex; gap: 10px; align-items: center; width: 100%; padding: 7px 9px;
+  background: transparent; border: 1px solid transparent; border-radius: 8px; font-size: .9rem; text-align: left;
+}
+.start-menu button:hover { background: #edf2ff; }
+.start-menu .app-tile { width: 31px; height: 31px; border-radius: 8px; box-shadow: none; }
+.toast {
+  position: absolute; z-index: 10100; bottom: 14px; right: 14px; max-width: calc(100% - 28px);
+  padding: 11px 15px; border-radius: 9px; border: 1px solid #c1e5d2;
+  background: #edfdf5; font-size: .9rem; box-shadow: 0 6px 24px #13264b40; pointer-events: none;
+}
+.missions-panel { overflow: hidden; }
+.missions-header { padding: 17px 18px 15px; border-bottom: 1px solid #e3eaf5; }
+.missions-header-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+.missions-header h2 { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 1.14rem; letter-spacing: -.026em; }
+.missions-mark { width: 34px; height: 34px; border-radius: 10px; color: #114d3c; background: #def6ec; }
+.mission-count { background: #edf1f8; padding: 5px 8px; border-radius: 7px; font-size: .86rem; font-weight: 700; white-space: nowrap; }
+#mission-progress { display: block; width: 100%; height: 6px; overflow: hidden; border: 0; border-radius: 9px; background: #e7edf5; color: var(--green); appearance: none; }
+#mission-progress::-webkit-progress-bar { background: #e7edf5; border-radius: 9px; }
+#mission-progress::-webkit-progress-value { background: var(--green); border-radius: 9px; }
+#mission-progress::-moz-progress-bar { background: var(--green); border-radius: 9px; }
+.mission-content { padding: 16px 18px; background: #f8faff; border-bottom: 1px solid #e3eaf5; }
+.mission-card-heading { margin: 0; font-size: 1.23rem; line-height: 1.18; letter-spacing: -.031em; }
+.mission-description { margin: 8px 0 12px; font-size: .91rem; line-height: 1.38; }
+.mission-steps { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.mission-step { display: flex; align-items: flex-start; gap: 8px; padding: 5px 6px; border: 1px solid transparent; border-radius: 8px; font-size: .875rem; line-height: 1.25; }
+.mission-step.is-current { background: #eaf0ff; border-color: #d5e0ff; }
+.mission-check { display: inline-grid; place-items: center; flex: 0 0 17px; width: 17px; height: 17px; border: 1.5px solid #aabbd7; border-radius: 50%; line-height: 1; }
+.is-current .mission-check { border-color: #4866de; }
+.is-done .mission-check { border-color: #a0d9be; color: #0a5537; background: #dcf7e9; }
+.mission-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 12px; }
+.mission-open, .mission-hint-toggle, .mission-next {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px;
+  padding: 6px 9px; border: 1px solid #c7d4ef; background: #fff; border-radius: 7px;
+  font-size: .82rem; font-weight: 700;
+}
+.mission-open, .mission-next { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+.mission-open:hover, .mission-next:hover { background: var(--indigo-dark); }
+.mission-hint-toggle:hover { background: #e9efff; }
+.mission-hint { margin: 9px 0 0; padding: 9px 10px; line-height: 1.38; background: #fff4d3; border-radius: 7px; font-size: .88rem; }
+.mission-index { padding: 13px 13px 12px; }
+.mission-index h3 { margin: 0 0 6px 5px; font-size: .86rem; }
+#mission-list { display: grid; gap: 3px; }
+.mission-item {
+  text-align: left; display: flex; align-items: center; gap: 9px; width: 100%; min-height: 35px;
+  background: transparent; border: 1px solid transparent; border-radius: 7px; padding: 4px 7px;
+}
+.mission-item:not(:disabled):hover { background: #f0f4ff; }
+.mission-item.is-active { border-color: #dbe4fc; background: #edf2ff; font-weight: 700; }
+.mission-item:disabled { color: #000; opacity: .62; }
+.mission-item-number {
+  display: grid; place-items: center; flex: 0 0 23px; width: 23px; height: 23px;
+  border-radius: 6px; background: #eef1f7; font-size: .77rem; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+.mission-item.is-active .mission-item-number { background: #dce6ff; }
+.mission-item.is-done .mission-item-number { background: #def6ea; }
+.mission-item-label { flex: 1; font-size: .88rem; }
+.mission-item-status { display: flex; align-items: center; flex-shrink: 0; font-size: .78rem; }
+.page-footer { padding: 15px 2px 17px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.page-footer > span { display: inline-flex; align-items: center; gap: 7px; font-size: .82rem; }
+.page-footer [data-icon] { color: #2e4889; }
+.desktop-expanded .workspace { grid-template-columns: minmax(0, 1fr); }
+.desktop-expanded .missions-panel { display: none; }
+.desktop-expanded .computer { min-height: calc(100dvh - 155px); }
+.site-dialog {
+  width: min(440px, calc(100% - 32px)); padding: 20px; border: 1px solid #cdd8ed;
+  border-radius: 15px; box-shadow: 0 16px 70px #101e5b57; background: white;
+}
+.site-dialog::backdrop { background: #12204685; }
+.dialog-title, .dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.dialog-title h2 { margin: 0; font-size: 1.2rem; }
+.dialog-footer { justify-content: flex-end; margin-top: 12px; }
+.site-dialog p, .help-tips { font-size: .95rem; line-height: 1.45; }
+.help-tips { display: grid; gap: 11px; padding-left: 24px; }
+.help-tips span { display: block; margin-top: 2px; }
+.noscript { padding: 12px; background: #fff4d3; border-radius: 8px; }
+.window-layer { position: absolute; z-index: 2; inset: 0; pointer-events: none; }
+.app-window {
+  position: absolute; pointer-events: auto; display: flex; flex-direction: column;
+  width: min(640px, calc(100% - 140px)); height: min(450px, calc(100% - 36px));
+  min-width: 0; min-height: 0; max-width: 100%; max-height: 100%;
+  overflow: hidden; border-radius: 13px; border: 1px solid #d4dff3;
+  background: white; box-shadow: 0 16px 42px #07164262;
+}
+.app-window[data-window="mouse"] { height: min(416px, calc(100% - 36px)); }
+.app-window[data-window="trash"] { height: min(385px, calc(100% - 36px)); }
+.app-window.is-maximized { width: 100%; height: 100%; top: 0 !important; left: 0 !important; border-radius: 0; }
+.app-window.is-active { border-color: #b8c9ef; }
+.window-titlebar {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 7px 0 13px; background: #f1f5ff; border-bottom: 1px solid #dde5f4;
+  user-select: none; touch-action: none; cursor: grab;
+}
+.window-titlebar:active { cursor: grabbing; }
+.window-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: .92rem; min-width: 0; }
+.window-title svg { color: #2e469c; flex-shrink: 0; }
+.window-controls { display: flex; align-items: center; gap: 2px; }
+.window-controls button {
+  display: grid; place-items: center; padding: 0; border: 1px solid transparent; border-radius: 6px;
+  width: 34px; height: 32px; background: transparent;
+}
+.window-controls button:hover { background: #dce6ff; border-color: #cdd9f9; }
+.window-controls button[data-window-action="close"]:hover { background: #ffe4e5; border-color: #ffd1d4; }
+.window-body { display: flex; flex-direction: column; min-height: 0; flex: 1; overflow: auto; }
+.app-toolbar {
+  flex-shrink: 0; display: flex; gap: 5px; flex-wrap: wrap; align-items: center;
+  min-height: 47px; padding: 6px 8px; border-bottom: 1px solid #e5ebf5; background: #fbfcff;
+}
+.app-button {
+  min-height: 33px; padding: 6px 8px; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  border: 1px solid #dce4f3; border-radius: 7px; background: #fff; font-size: .84rem; text-align: left;
+}
+.app-button:not(:disabled):hover { background: #ecf2ff; border-color: #c8d6f5; }
+.app-button.is-primary { font-weight: 700; color: #fff; background: var(--indigo); border-color: var(--indigo); }
+.app-button.is-primary:not(:disabled):hover { color: #fff; background: var(--indigo-dark); border-color: var(--indigo-dark); }
+.file-layout {
+  display: grid; grid-template-columns: minmax(104px, 25%) minmax(0, 1fr); flex: 1; min-height: 0;
+}
+.file-sidebar {
+  display: flex; align-items: stretch; align-content: start; flex-direction: column; gap: 3px;
+  padding: 10px 6px; background: #f7f9fe; border-right: 1px solid #e5ebf5;
+}
+.file-sidebar button, .file-path button {
+  display: flex; align-items: center; gap: 5px; min-height: 32px; border: 0; border-radius: 6px;
+  padding: 4px 6px; background: transparent; text-align: left; font-size: .84rem;
+}
+.file-sidebar button:hover, .file-sidebar [aria-current], .file-path button:hover { background: #e7efff; }
+.file-main { min-height: 0; min-width: 0; display: flex; flex-direction: column; }
+.file-path {
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap; min-height: 36px;
+  padding: 4px 9px; border-bottom: 1px solid #e6ecf5; font-size: .85rem;
+  overflow-wrap: anywhere;
+}
+.file-list { flex: 1; min-height: 0; overflow: auto; padding: 6px 8px; }
+.file-row {
+  width: 100%; display: flex; align-items: center; gap: 8px; min-height: 37px; padding: 6px 8px;
+  border: 1px solid transparent; border-radius: 6px; background: #fff; text-align: left; font-size: .91rem;
+  overflow-wrap: anywhere;
+}
+.file-row:hover { background: #f2f6ff; }
+.file-row.is-selected, .file-row[aria-selected="true"] { border-color: #c6d7fd; background: #e8efff; }
+.file-row.is-cut { opacity: .65; }
+.file-row svg { color: #344a90; flex-shrink: 0; }
+.file-row + .file-row { margin-top: 2px; }
+.file-dialog {
+  width: min(400px, calc(100% - 26px)); margin: auto; padding: 17px;
+  border: 1px solid #cbd7f0; border-radius: 12px; box-shadow: 0 12px 36px #10205052; background: #fff;
+}
+.file-dialog::backdrop { background: #11214e6b; }
+.file-dialog h2, .file-dialog h3 { font-size: 1.1rem; margin: 0 0 10px; }
+.file-dialog label { display: grid; gap: 5px; margin: 8px 0; font-size: .91rem; }
+.file-dialog input { width: 100%; min-height: 36px; border: 1px solid #b9c8e8; border-radius: 7px; padding: 6px 8px; }
+.file-context {
+  position: absolute; z-index: 10030; min-width: 160px; margin: 0; padding: 5px;
+  border: 1px solid #ccd8f0; border-radius: 9px; background: #fff; box-shadow: 0 8px 27px #14234f47;
+}
+.file-context button {
+  display: flex; align-items: center; gap: 7px; min-height: 33px; width: 100%; padding: 6px 8px;
+  font-size: .88rem; text-align: left; border: 0; background: transparent; border-radius: 5px;
+}
+.file-context button:not(:disabled):hover { background: #eef3ff; }
+.editor-layout { display: flex; flex-direction: column; flex: 1; min-height: 0; background: #fff; }
+.editor-text {
+  flex: 1; width: 100%; resize: none; min-height: 130px; padding: 13px 15px;
+  line-height: 1.5; border: 0; background: repeating-linear-gradient(#fff 0 28px, #f1f4f9 29px 30px);
+  background-position: 0 10px; font-size: 1rem;
+}
+.editor-text:focus-visible { outline-offset: -3px; }
+.app-status { border-top: 1px solid #e6ebf4; padding: 7px 12px; background: #f8faff; font-size: .84rem; margin: 0; }
+.practice-intro { margin: 14px 14px 9px; line-height: 1.4; font-size: .94rem; }
+.mouse-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 4px 12px 10px; }
+.mouse-tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  min-height: 70px; padding: 7px; border: 1px solid #cddafb; background: #f1f5ff;
+  border-radius: 9px; font-size: .86rem; font-weight: 700; text-align: center; user-select: none;
+}
+.mouse-tile:hover { background: #e8efff; }
+.mouse-tile.is-done, .mouse-drag-area .is-done { background: var(--soft-green); border-color: #93dcbc; }
+.mouse-drag-area {
+  position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 94px; padding: 9px 13px; margin: 0 12px 12px; background: #f7f9fd; border-radius: 9px;
+}
+.mouse-token, .mouse-drop {
+  min-height: 50px; min-width: 73px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1px solid #c9d8f8; background: #e5eeff; border-radius: 8px; padding: 7px 9px; font-weight: 700;
+  font-size: .86rem; text-align: center; user-select: none;
+}
+.mouse-token { cursor: grab; touch-action: none; }
+.mouse-token:active { cursor: grabbing; }
+.mouse-drop { border-style: dashed; background: white; }
+
+@media (max-width: 1120px) {
+  body { padding-inline: 19px; }
+  .workspace { grid-template-columns: minmax(0, 1fr) minmax(306px, 321px); gap: 13px; }
+  .computer { min-height: min(670px, calc(100dvh - 140px)); }
+  .desktop-icons { width: 94px; left: 6px; }
+  .app-window { width: min(640px, calc(100% - 108px)); }
+}
+@media (max-width: 850px) {
+  body { padding-inline: 13px; }
+  .page-header { height: 78px; }
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .computer { min-height: 0; }
+  .desktop { min-height: clamp(430px, 59dvh, 570px); }
+  #mission-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  body { padding-inline: 9px; }
+  .page-header { height: 68px; }
+  .brand, .page-tools { gap: 8px; }
+  .brand-icon { width: 40px; height: 40px; border-radius: 11px; }
+  .brand h1 { font-size: 1.42rem; }
+  .brand p { font-size: .75rem; margin-top: 4px; }
+  .grade { display: none; }
+  .computer, .missions-panel { border-radius: 12px; }
+  .computer-header { min-height: 43px; }
+  .desktop { min-height: 405px; }
+  .desktop-icons { width: 87px; top: 5px; }
+  .desktop-icon { font-size: .78rem; }
+  .app-tile { width: 44px; height: 44px; border-radius: 11px; }
+  .app-window { width: calc(100% - 8px); height: calc(100% - 8px); top: 4px !important; left: 4px !important; }
+  .app-toolbar { gap: 4px; }
+  .app-button { font-size: .79rem; }
+  .file-layout { grid-template-columns: minmax(88px, 24%) minmax(0, 1fr); }
+  .file-sidebar > button, .file-path { font-size: .78rem; }
+  .taskbar { min-height: 49px; padding: 5px 8px; gap: 6px; }
+  .task-button, .start-button { padding: 5px 6px; min-height: 33px; }
+  .page-footer { padding-top: 10px; }
+  .mission-item-label { font-size: .81rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .desktop-icon, .mission-item, .app-button, .start-button { transition: background-color .13s, border-color .13s; }
+}
+
+.window-body { position: relative; }
+.file-dialog {
+  position: absolute; z-index: 6; inset: 0; width: auto; margin: 0; display: grid;
+  align-items: center; justify-items: center; padding: 13px; border: 0; border-radius: 0;
+  background: #10224f62; box-shadow: none;
+}
+.file-dialog-card {
+  width: min(400px, 100%); max-height: 100%; overflow: auto; padding: 16px; border-radius: 12px;
+  border: 1px solid #cbd7f0; background: white; box-shadow: 0 12px 36px #10205052;
+}
+.file-dialog p { font-size: .9rem; line-height: 1.4; }
+.file-dialog select {
+  color: #000; width: 100%; min-height: 36px; border: 1px solid #b9c8e8;
+  border-radius: 7px; padding: 5px 8px; background: white; font: inherit;
+}
+.file-dialog-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 13px; }
+.file-error { padding: 8px; background: #ffeaeb; border: 1px solid #efbfc5; border-radius: 6px; }
+.file-sidebar .is-selected { background: #e7efff; }
+.empty-state { margin: 14px 8px; font-size: .9rem; }
+.mouse-tile span { font-weight: 400; font-size: .84rem; line-height: 1.3; }
+.mouse-drag-area p { margin: 5px 0 0; line-height: 1.3; font-size: .87rem; }
+.mouse-token { min-width: 50px; width: 52px; flex-shrink: 0; color: #422500; background: #fff0b7; border-color: #f0cf5b; }
+.mouse-token > span { font-size: 1.4rem; }
+.mouse-token.is-dragging { z-index: 2; cursor: grabbing; box-shadow: 0 7px 16px #233e8350; }
+.mouse-drop { min-width: 84px; }
+.mission-completion { padding: 10px; margin: 11px 0 0; border-radius: 8px; background: var(--soft-green); font-size: .88rem; font-weight: 700; }
+@media (max-width: 520px) {
+  .mouse-tile { padding: 5px 3px; }
+  .mouse-tile span, .mouse-drag-area p { font-size: .77rem; }
+  .mouse-grid { gap: 5px; }
+  .mouse-drag-area { padding: 8px; }
+  .mouse-drop { min-width: 64px; font-size: .75rem; }
+}
+</style>
+</head>
+<body>
+  <header class="page-header">
+    <div class="brand">
+      <span class="brand-icon" data-icon="logo"></span>
+      <div><h1>Déclic <span>OS</span></h1><p>Premiers pas sur ordinateur</p></div>
+    </div>
+    <div class="page-tools">
+      <span class="grade"><span data-icon="laptop"></span> Classe de 6e</span>
+      <button class="header-button" type="button" id="help-button"><span data-icon="help"></span><span>Aide</span></button>
+    </div>
+  </header>
+  <main class="workspace">
+    <section class="computer" aria-labelledby="desktop-label">
+      <header class="computer-header">
+        <h2 id="desktop-label"><span data-icon="laptop"></span> Bureau d’entraînement</h2>
+        <button type="button" class="plain-icon screen-button" id="screen-button" aria-label="Agrandir le bureau" title="Agrandir le bureau"><span data-icon="expand"></span></button>
+      </header>
+      <div class="desktop" id="desktop">
+        <div class="wallpaper" aria-hidden="true">
+          <div class="wall-grain"></div><div class="wall-ribbon wall-ribbon-back"></div><div class="wall-ribbon wall-ribbon-mid"></div><div class="wall-ribbon wall-ribbon-front"></div><div class="wall-shine"></div>
+        </div>
+        <div class="desktop-icons" id="desktop-icons" aria-label="Raccourcis du bureau">
+          <button type="button" data-app="files" class="desktop-icon" title="Double-clique pour ouvrir Explorateur">
+            <span class="app-tile tile-files" data-icon="files"></span><span>Explorateur</span>
+          </button>
+          <button type="button" data-app="editor" class="desktop-icon" title="Double-clique pour ouvrir Bloc-notes">
+            <span class="app-tile tile-editor" data-icon="editor"></span><span>Bloc-notes</span>
+          </button>
+          <button type="button" data-app="mouse" class="desktop-icon" title="Double-clique pour ouvrir Atelier souris">
+            <span class="app-tile tile-mouse" data-icon="mouse"></span><span>Atelier souris</span>
+          </button>
+          <button type="button" data-app="trash" class="desktop-icon" title="Double-clique pour ouvrir Corbeille">
+            <span class="app-tile tile-trash" data-icon="trash"></span><span>Corbeille</span>
+          </button>
+        </div>
+        <div id="window-layer" class="window-layer"></div>
+        <div class="start-menu" id="start-menu" hidden>
+          <strong>Applications</strong>
+          <button type="button" data-app="files"><span class="app-tile tile-files" data-icon="files"></span> Explorateur</button>
+          <button type="button" data-app="editor"><span class="app-tile tile-editor" data-icon="editor"></span> Bloc-notes</button>
+          <button type="button" data-app="mouse"><span class="app-tile tile-mouse" data-icon="mouse"></span> Atelier souris</button>
+          <button type="button" data-app="trash"><span class="app-tile tile-trash" data-icon="trash"></span> Corbeille</button>
+        </div>
+        <div id="toast" class="toast" role="status" hidden></div>
+      </div>
+      <nav class="taskbar" aria-label="Barre des tâches">
+        <button class="start-button" type="button" id="start-button" aria-expanded="false" aria-controls="start-menu"><span data-icon="grid"></span> Démarrer</button>
+        <span class="taskbar-divider" aria-hidden="true"></span>
+        <div class="task-list" id="task-list"></div>
+        <time id="clock" class="clock" aria-label="Heure locale"></time>
+      </nav>
+    </section>
+    <aside id="missions-panel" class="missions-panel" aria-labelledby="missions-title">
+      <header class="missions-header">
+        <div class="missions-header-row">
+          <h2 id="missions-title"><span class="missions-mark" data-icon="flag"></span> Tes missions</h2>
+          <span class="mission-count" id="mission-count">0 / 6</span>
+        </div>
+        <progress id="mission-progress" max="6" value="0" aria-label="Missions réussies"></progress>
+      </header>
+      <div id="mission-content" class="mission-content"></div>
+      <section class="mission-index" aria-labelledby="mission-index-title">
+        <h3 id="mission-index-title">Le parcours</h3>
+        <div id="mission-list"></div>
+      </section>
+      <p id="mission-status" class="visually-hidden" role="status"></p>
+    </aside>
+  </main>
+  <footer class="page-footer">
+    <span><span data-icon="pointer"></span> Sur le bureau, double-clique sur une icône pour l’ouvrir.</span>
+    <span><span data-icon="save"></span> Progression enregistrée sur ce navigateur</span>
+  </footer>
+  <dialog id="help-dialog" class="site-dialog" aria-labelledby="help-title">
+    <div class="dialog-title"><h2 id="help-title">Besoin d’aide ?</h2><button type="button" class="plain-icon" data-close-dialog aria-label="Fermer l’aide" title="Fermer l’aide"><span data-icon="close"></span></button></div>
+    <ul class="help-tips">
+      <li><strong>Sur le bureau</strong><span>Un clic sélectionne une icône. Deux clics rapides l’ouvrent.</span></li>
+      <li><strong>Dans une fenêtre</strong><span>Utilise le bouton − pour réduire la fenêtre, puis clique sur son nom dans la barre des tâches pour la retrouver.</span></li>
+      <li><strong>Pour les missions</strong><span>Clique sur « Voir un indice » si tu bloques. Tes fichiers et ta progression restent sur ce navigateur.</span></li>
+    </ul>
+    <div class="dialog-footer"><button id="reset-button" class="header-button" type="button"><span data-icon="reset"></span> Recommencer le parcours</button></div>
+  </dialog>
+  <dialog id="reset-dialog" class="site-dialog" aria-labelledby="reset-title">
+    <div class="dialog-title"><h2 id="reset-title">Recommencer le parcours ?</h2></div>
+    <p>Les fichiers créés dans le bureau et les missions réussies seront effacés.</p>
+    <div class="dialog-footer"><button type="button" class="header-button" data-close-dialog>Annuler</button><button type="button" class="app-button is-primary" id="confirm-reset">Recommencer</button></div>
+  </dialog>
+  <noscript><p class="noscript">Active JavaScript dans ton navigateur pour utiliser le bureau et faire les missions.</p></noscript>
+  <script>
+(() => {
+  const symbols = {
+    logo: '<rect x="3" y="4" width="18" height="13" rx="3"/><path d="M8 21h8m-4-4v4m-2-12 3 2-3 2"/>',
+    laptop: '<rect x="4" y="4" width="16" height="12" rx="2"/><path d="M2 20h20m-14 0h8"/>',
+    files: '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 10h18"/>',
+    folder: '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+    editor: '<rect x="6" y="3" width="14" height="18" rx="2"/><path d="M9 8h7m-7 4h7m-7 4h5M4 7h3m-3 5h3m-3 5h3"/>',
+    file: '<path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6m-6 4h6"/>',
+    trash: '<path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/>',
+    mouse: '<rect x="6" y="2.5" width="12" height="19" rx="6"/><path d="M12 6v4"/>',
+    keyboard: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01m3 0h.01m4 0h.01m3 0h.01M8 14h8"/>',
+    help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2.4-2.5 4m0 3h.01"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/>',
+    grid: '<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',
+    flag: '<path d="M5 21V4m0 1c5-4 7 4 14 0v9c-7 4-9-4-14 0"/>',
+    check: '<path d="m5 12 4 4L19 6"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
+    minimize: '<path d="M5 12h14"/>',
+    maximize: '<rect x="5" y="5" width="14" height="14" rx="1"/>',
+    restore: '<rect x="5" y="9" width="10" height="10" rx="1"/><path d="M9 9V5h10v10h-4"/>',
+    menu: '<path d="M5 7h14M5 12h14M5 17h14"/>',
+    reset: '<path d="M4 10a8 8 0 1 1 1 7m-1-7V5m0 5h5"/>',
+    more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+    chevron: '<path d="m9 6 6 6-6 6"/>',
+    up: '<path d="m5 12 7-7 7 7m-7-7v14"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+    cut: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="m8.2 8.2 12 12m-12-4.4 12-12"/>',
+    paste: '<rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3h6v2m-6 8h6m-6 4h6"/>',
+    save: '<path d="M4 4h13l3 3v13H4zM8 4v5h8V4m-8 16v-6h8v6"/>',
+    move: '<path d="M12 2v20M2 12h20m-7-7-3-3-3 3m6 14-3 3-3-3m-4-4-3-3 3-3m14 6 3-3-3-3"/>',
+    panel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
+    expand: '<path d="M4 9V4h5m6 0h5v5m0 6v5h-5m-6 0H4v-5"/>',
+    shrink: '<path d="M9 4v5H4m16 0h-5V4m0 16v-5h5M4 15h5v5"/>',
+    pointer: '<path d="m5 3 14 10-7 1-3 6z"/>',
+    download: '<path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/>'
+  };
+
+  window.icon = (name, size = 20) => {
+    const path = symbols[name] || symbols.file;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true">${path}</svg>`;
+  };
+  const iconSizes = { '.brand-icon': 28, '.desktop-icon .app-tile': 28, '.start-menu .app-tile': 20 };
+  document.querySelectorAll('[data-icon]').forEach(element => {
+    const match = Object.keys(iconSizes).find(selector => element.matches(selector));
+    element.innerHTML = icon(element.dataset.icon, match ? iconSizes[match] : 19);
+  });
+
+  const clock = document.getElementById('clock');
+  const timeFormat = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  function updateClock() {
+    const value = timeFormat.format(new Date());
+    clock.textContent = value;
+    clock.dateTime = value;
+  }
+  updateClock();
+  window.setInterval(updateClock, 15000);
+
+  const helpDialog = document.getElementById('help-dialog');
+  const resetDialog = document.getElementById('reset-dialog');
+  const helpButton = document.getElementById('help-button');
+  helpButton.addEventListener('click', () => helpDialog.showModal());
+  document.getElementById('reset-button').addEventListener('click', () => {
+    helpDialog.close();
+    resetDialog.showModal();
+  });
+  document.querySelectorAll('[data-close-dialog]').forEach(button => {
+    button.addEventListener('click', () => button.closest('dialog').close());
+  });
+  document.getElementById('confirm-reset').addEventListener('click', () => {
+    window.Declic.reset();
+    window.DeclicMissions.reset();
+    resetDialog.close();
+    helpButton.focus();
+  });
+
+  const screenButton = document.getElementById('screen-button');
+  screenButton.addEventListener('click', () => {
+    const expanded = document.body.classList.toggle('desktop-expanded');
+    const label = expanded ? 'Réafficher les missions' : 'Agrandir le bureau';
+    screenButton.setAttribute('aria-label', label);
+    screenButton.title = label;
+    screenButton.innerHTML = icon(expanded ? 'shrink' : 'expand', 19);
+  });
+})();
+</script>
+  <script>
+(() => {
+  "use strict";
+
+  const apps = {
+    files: { title: "Explorateur", icon: "files" },
+    editor: { title: "Bloc-notes", icon: "editor" },
+    mouse: { title: "Atelier souris", icon: "mouse" },
+    trash: { title: "Corbeille", icon: "trash" },
+  };
+  const layer = document.getElementById("window-layer");
+  const taskList = document.getElementById("task-list");
+  const desktopIcons = document.getElementById("desktop-icons");
+  const startButton = document.getElementById("start-button");
+  const startMenu = document.getElementById("start-menu");
+  const toast = document.getElementById("toast");
+  const storeKey = "declic-os-files-v1";
+  const rootId = "documents";
+  const windows = new Map();
+  let topLayer = 0;
+  let activeApp = null;
+  let explorerFolder = rootId;
+  let selectedFile = null;
+  let selectedTrash = null;
+  let clipboard = null;
+  let editorFile = null;
+  let editorText = "";
+  let editorSavedText = "";
+  let toastTimer;
+
+  function initialFiles() {
+    return [
+      { id: "example-folder", name: "Mes exemples", kind: "folder", parentId: rootId },
+      {
+        id: "welcome",
+        name: "Bienvenue.txt",
+        kind: "file",
+        parentId: rootId,
+        text: "Bienvenue sur ton bureau d’exercice !\n\nIci, chaque fichier est enregistré dans le simulateur. Tu peux ouvrir, ranger, renommer ou déplacer les documents.",
+      },
+      {
+        id: "example-note",
+        name: "Notes.txt",
+        kind: "file",
+        parentId: "example-folder",
+        text: "Un dossier peut contenir des fichiers et d’autres dossiers.",
+      },
+    ];
+  }
+
+  function loadFiles() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(storeKey));
+      if (Array.isArray(cached)) return cached;
+    } catch {
+      // The desktop remains usable if this browser restricts local storage.
+    }
+    return initialFiles();
+  }
+
+  let files = loadFiles();
+
+  function saveFiles() {
+    try {
+      localStorage.setItem(storeKey, JSON.stringify(files));
+    } catch {
+      // Keep the current session usable even when storage is unavailable.
+    }
+  }
+
+  function icon(name, size = 18) {
+    return window.icon?.(name, size) || "";
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function emit(type, detail = {}) {
+    window.dispatchEvent(new CustomEvent("declic:action", { detail: { type, ...detail } }));
+  }
+
+  function notify(message) {
+    if (!toast) return;
+    toast.hidden = false;
+    toast.textContent = message;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 3400);
+  }
+
+  function setStart(open) {
+    if (!startMenu || !startButton) return;
+    startMenu.hidden = !open;
+    startButton.setAttribute("aria-expanded", String(open));
+  }
+
+  function setActive(app) {
+    activeApp = app;
+    for (const [key, state] of windows) {
+      const active = key === app;
+      state.node.classList.toggle("is-active", active);
+      state.task.classList.toggle("is-active", active);
+      state.task.setAttribute("aria-pressed", String(active));
+      if (active) state.node.style.zIndex = String(++topLayer);
+    }
+  }
+
+  function makeActiveAvailable() {
+    const visible = Array.from(windows.entries())
+      .filter(([, state]) => !state.node.hidden)
+      .sort((a, b) => Number(b[1].node.style.zIndex) - Number(a[1].node.style.zIndex));
+    setActive(visible[0]?.[0] || null);
+  }
+
+  function placeWindow(node, x, y) {
+    const maxX = Math.max(0, layer.clientWidth - node.offsetWidth - 8);
+    const maxY = Math.max(0, layer.clientHeight - node.offsetHeight - 8);
+    node.style.left = `${Math.max(0, Math.min(x, maxX))}px`;
+    node.style.top = `${Math.max(0, Math.min(y, maxY))}px`;
+  }
+
+  function toggleMaximize(app) {
+    const state = windows.get(app);
+    if (!state) return;
+    const wasMaximized = state.node.classList.toggle("is-maximized");
+    const button = state.node.querySelector('[data-window-action="maximize"]');
+    const label = wasMaximized ? "Rétablir la taille" : "Agrandir";
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.innerHTML = icon(wasMaximized ? "restore" : "maximize", 15);
+    if (!wasMaximized) placeWindow(state.node, ...windowPosition(state.node));
+    emit(wasMaximized ? "window-maximize" : "window-unmaximize", { app });
+  }
+
+  function windowPosition(node) {
+    return [Number.parseFloat(node.style.left) || 0, Number.parseFloat(node.style.top) || 0];
+  }
+
+  function bringToFront(app, focus = false) {
+    const state = windows.get(app);
+    if (!state) return;
+    const wasHidden = state.node.hidden;
+    state.node.hidden = false;
+    setActive(app);
+    if (focus) state.node.focus({ preventScroll: true });
+    if (wasHidden) {
+      if (!state.node.classList.contains("is-maximized")) {
+        placeWindow(state.node, ...windowPosition(state.node));
+      }
+      emit("window-restore", { app });
+    }
+  }
+
+  function minimizeWindow(app) {
+    const state = windows.get(app);
+    if (!state || state.node.hidden) return;
+    state.node.hidden = true;
+    if (activeApp === app) makeActiveAvailable();
+    state.task.focus({ preventScroll: true });
+    emit("window-minimize", { app });
+  }
+
+  function closeWindow(app, returnFocus = true) {
+    const state = windows.get(app);
+    if (!state) return;
+    state.node.remove();
+    state.task.remove();
+    windows.delete(app);
+    if (activeApp === app) makeActiveAvailable();
+    if (returnFocus) {
+      const shortcut = desktopIcons?.querySelector(`[data-app="${app}"]`);
+      (shortcut || startButton)?.focus({ preventScroll: true });
+    }
+    emit("window-close", { app });
+  }
+
+  function startWindowDrag(app, event) {
+    if (event.button !== 0 || event.target.closest("button")) return;
+    const state = windows.get(app);
+    if (state.node.classList.contains("is-maximized")) return;
+    const titlebar = event.currentTarget;
+    const [x, y] = windowPosition(state.node);
+    const startX = event.clientX;
+    const startY = event.clientY;
+    titlebar.setPointerCapture(event.pointerId);
+    titlebar.onpointermove = (move) => {
+      placeWindow(state.node, x + move.clientX - startX, y + move.clientY - startY);
+    };
+    const finish = () => {
+      titlebar.onpointermove = null;
+      titlebar.onpointerup = null;
+      titlebar.onpointercancel = null;
+      const [finalX, finalY] = windowPosition(state.node);
+      if (x !== finalX || y !== finalY) emit("window-move", { app });
+    };
+    titlebar.onpointerup = finish;
+    titlebar.onpointercancel = finish;
+  }
+
+  function open(app) {
+    const spec = apps[app];
+    if (!spec || !layer || !taskList) return;
+    setStart(false);
+    if (windows.has(app)) {
+      bringToFront(app, true);
+      return;
+    }
+
+    const node = document.createElement("section");
+    node.id = `app-window-${app}`;
+    node.className = "app-window";
+    node.dataset.window = app;
+    node.tabIndex = -1;
+    node.setAttribute("aria-labelledby", `window-title-${app}`);
+    node.innerHTML = `
+      <header class="window-titlebar">
+        <span class="window-title" id="window-title-${app}">${icon(spec.icon)} <span>${spec.title}</span></span>
+        <div class="window-controls">
+          <button type="button" data-window-action="minimize" title="Réduire" aria-label="Réduire">${icon("minimize", 15)}</button>
+          <button type="button" data-window-action="maximize" title="Agrandir" aria-label="Agrandir">${icon("maximize", 15)}</button>
+          <button type="button" data-window-action="close" title="Fermer" aria-label="Fermer">${icon("close", 15)}</button>
+        </div>
+      </header>
+      <div class="window-body"></div>`;
+
+    const task = document.createElement("button");
+    task.type = "button";
+    task.className = "task-button";
+    task.setAttribute("aria-controls", node.id);
+    task.dataset.task = app;
+    task.innerHTML = `${icon(spec.icon, 17)}<span>${spec.title}</span>`;
+    task.addEventListener("click", () => {
+      if (activeApp === app && !node.hidden) minimizeWindow(app);
+      else bringToFront(app, true);
+    });
+
+    windows.set(app, { node, task });
+    layer.append(node);
+    taskList.append(task);
+    const offset = 22 * (windows.size - 1);
+    const titlebar = node.querySelector(".window-titlebar");
+    node.addEventListener("pointerdown", () => setActive(app));
+    node.addEventListener("focusin", () => {
+      if (activeApp !== app) setActive(app);
+    });
+    titlebar.addEventListener("pointerdown", (event) => startWindowDrag(app, event));
+    titlebar.addEventListener("dblclick", (event) => {
+      if (!event.target.closest("button")) toggleMaximize(app);
+    });
+    titlebar.addEventListener("click", (event) => {
+      const action = event.target.closest("button")?.dataset.windowAction;
+      if (action === "minimize") minimizeWindow(app);
+      if (action === "maximize") toggleMaximize(app);
+      if (action === "close") closeWindow(app);
+    });
+    render(app);
+    placeWindow(node, 126 + offset, 32 + offset);
+    bringToFront(app, true);
+    emit("window-open", { app });
+  }
+
+  function bodyFor(app) {
+    return windows.get(app)?.node.querySelector(".window-body");
+  }
+
+  function render(app) {
+    const body = bodyFor(app);
+    if (!body) return;
+    if (app === "files") renderExplorer(body);
+    if (app === "editor") renderEditor(body);
+    if (app === "trash") renderTrash(body);
+    if (app === "mouse") renderMouse(body);
+  }
+
+  function byId(id) {
+    return files.find((file) => file.id === id);
+  }
+
+  function folderName(id) {
+    return id === rootId ? "Documents" : byId(id)?.name || "Documents";
+  }
+
+  function isTrashed(file) {
+    for (let node = file; node; node = byId(node.parentId)) {
+      if (node.trashed) return true;
+    }
+    return false;
+  }
+
+  function inside(folderId, candidateId) {
+    for (let node = byId(folderId); node; node = byId(node.parentId)) {
+      if (node.id === candidateId) return true;
+    }
+    return false;
+  }
+
+  function sorted(items) {
+    return items.sort((a, b) =>
+      (a.kind === b.kind ? 0 : a.kind === "folder" ? -1 : 1) ||
+      a.name.localeCompare(b.name, "fr", { sensitivity: "base" })
+    );
+  }
+
+  function contents(parentId) {
+    return sorted(files.filter((file) => file.parentId === parentId && !file.trashed));
+  }
+
+  function folderChoices() {
+    const choices = [{ id: rootId, label: "Documents" }];
+    const addChildren = (parentId, label) => {
+      for (const child of contents(parentId)) {
+        if (child.kind !== "folder") continue;
+        const path = `${label} / ${child.name}`;
+        choices.push({ id: child.id, label: path });
+        addChildren(child.id, path);
+      }
+    };
+    addChildren(rootId, "Documents");
+    return choices;
+  }
+
+  function idForNewFile() {
+    return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  function emitFile(type, file, extra = {}) {
+    emit(type, { id: file.id, name: file.name, parentId: file.parentId, ...extra });
+  }
+
+  function toolbarButton(action, label, glyph, disabled = false, primary = false) {
+    return `<button type="button" class="app-button${primary ? " is-primary" : ""}" data-command="${action}"${disabled ? " disabled" : ""}>${icon(glyph, 16)}<span>${label}</span></button>`;
+  }
+
+  function fileRow(file, selected, extra = "") {
+    const glyph = file.kind === "folder" ? "folder" : "file";
+    return `<button type="button" data-file-id="${escapeHtml(file.id)}" class="file-row${selected ? " is-selected" : ""}" aria-pressed="${selected}">${icon(glyph, 21)}<span>${escapeHtml(file.name)}</span>${extra}</button>`;
+  }
+
+  function renderExplorer(body) {
+    if (explorerFolder !== rootId && (!byId(explorerFolder) || isTrashed(byId(explorerFolder)))) {
+      explorerFolder = rootId;
+      selectedFile = null;
+    }
+    const entries = contents(explorerFolder);
+    const current = entries.find((file) => file.id === selectedFile);
+    const path = folderChoices().find((entry) => entry.id === explorerFolder);
+    body.innerHTML = `
+      <div class="app-toolbar">
+        ${toolbarButton("new-folder", "Nouveau dossier", "plus", false, true)}
+        ${toolbarButton("open", "Ouvrir", "folder", !current)}
+        ${toolbarButton("rename", "Renommer", "editor", !current)}
+        ${toolbarButton("cut", "Couper", "cut", !current)}
+        ${toolbarButton("paste", "Coller", "paste", !clipboard)}
+        ${toolbarButton("trash", "Mettre à la corbeille", "trash", !current)}
+      </div>
+      <div class="file-layout">
+        <nav class="file-sidebar" aria-label="Emplacements">
+          <button type="button" data-command="documents" class="file-location${explorerFolder === rootId ? " is-selected" : ""}">${icon("folder", 17)} Documents</button>
+          <button type="button" data-command="open-trash" class="file-location">${icon("trash", 17)} Corbeille</button>
+        </nav>
+        <section class="file-main" aria-label="Contenu du dossier">
+          <div class="file-path">
+            <button type="button" class="app-button" data-command="up" aria-label="Dossier parent" title="Dossier parent"${explorerFolder === rootId ? " disabled" : ""}>${icon("up", 16)}</button>
+            <span>${escapeHtml(path?.label || "Documents")}</span>
+          </div>
+          <div class="file-list">
+            ${entries.length ? entries.map((file) => fileRow(file, file === current)).join("") : '<p class="empty-state">Ce dossier est vide.</p>'}
+          </div>
+          <div class="app-status">${entries.length} élément${entries.length === 1 ? "" : "s"}${current ? ` · ${escapeHtml(current.name)}` : ""}</div>
+        </section>
+      </div>
+      <div class="file-context" hidden></div>`;
+    body.onclick = explorerClick;
+    body.ondblclick = (event) => {
+      const row = event.target.closest("[data-file-id]");
+      if (row) openEntry(byId(row.dataset.fileId));
+    };
+    body.oncontextmenu = explorerContextMenu;
+    body.onkeydown = explorerKeys;
+  }
+
+  function selectExplorer(id) {
+    selectedFile = id;
+    const body = bodyFor("files");
+    const file = byId(id);
+    const row = Array.from(body.querySelectorAll("[data-file-id]"))
+      .find((item) => item.dataset.fileId === id);
+    const rows = body.querySelectorAll("[data-file-id]");
+    rows.forEach((item) => {
+      const selected = item === row;
+      item.classList.toggle("is-selected", selected);
+      item.setAttribute("aria-pressed", String(selected));
+    });
+    for (const command of ["open", "rename", "cut", "trash"]) {
+      body.querySelector(`.app-toolbar [data-command="${command}"]`).disabled = !row;
+    }
+    const count = rows.length;
+    body.querySelector(".app-status").textContent =
+      `${count} élément${count === 1 ? "" : "s"}${file ? ` · ${file.name}` : ""}`;
+  }
+
+  function explorerClick(event) {
+    const row = event.target.closest("[data-file-id]");
+    const command = event.target.closest("[data-command]")?.dataset.command;
+    const context = event.currentTarget.querySelector(".file-context");
+    if (context) context.hidden = true;
+    if (row) {
+      selectExplorer(row.dataset.fileId);
+      if (event.detail === 0) openEntry(byId(row.dataset.fileId));
+    }
+    if (command) explorerCommand(command);
+  }
+
+  function explorerContextMenu(event) {
+    if (!event.target.closest(".file-list") || event.target.closest(".file-dialog")) return;
+    event.preventDefault();
+    const row = event.target.closest("[data-file-id]");
+    selectExplorer(row?.dataset.fileId || null);
+    const body = event.currentTarget;
+    const menu = body.querySelector(".file-context");
+    menu.innerHTML = row
+      ? toolbarButton("open", "Ouvrir", "folder") +
+        toolbarButton("rename", "Renommer", "editor") +
+        toolbarButton("cut", "Couper", "cut") +
+        toolbarButton("trash", "Mettre à la corbeille", "trash")
+      : toolbarButton("new-folder", "Nouveau dossier", "plus") +
+        toolbarButton("paste", "Coller", "paste", !clipboard);
+    const rowBounds = row?.getBoundingClientRect();
+    placeContext(menu, body, event.clientX || rowBounds?.left || 0, event.clientY || rowBounds?.bottom || 0);
+    menu.querySelector("button")?.focus();
+  }
+
+  function placeContext(menu, body, x, y) {
+    menu.hidden = false;
+    const bounds = body.getBoundingClientRect();
+    menu.style.left = `${Math.max(2, Math.min(x - bounds.left, bounds.width - menu.offsetWidth - 4))}px`;
+    menu.style.top = `${Math.max(2, Math.min(y - bounds.top, bounds.height - menu.offsetHeight - 4))}px`;
+  }
+
+  function explorerKeys(event) {
+    if (event.target.closest("input, select, textarea, .file-dialog")) return;
+    const context = event.currentTarget.querySelector(".file-context");
+    if (event.key === "Escape" && !context.hidden) {
+      context.hidden = true;
+      focusFile("files", selectedFile);
+      return;
+    }
+    let command;
+    if (event.key === "F2") command = "rename";
+    if (event.key === "Delete") command = "trash";
+    if (event.ctrlKey || event.metaKey) {
+      const key = event.key.toLowerCase();
+      if (key === "x") command = "cut";
+      if (key === "v") command = "paste";
+    }
+    if (command) {
+      event.preventDefault();
+      explorerCommand(command);
+    }
+  }
+
+  function navigate(folderId) {
+    explorerFolder = folderId;
+    selectedFile = null;
+    render("files");
+    bodyFor("files")?.querySelector(".file-path button:not(:disabled), .file-list button, .app-toolbar button")?.focus();
+    emit("folder-open", { id: folderId, name: folderName(folderId) });
+  }
+
+  function openEntry(file) {
+    if (!file || isTrashed(file)) return;
+    if (file.kind === "folder") {
+      navigate(file.id);
+      return;
+    }
+    const load = () => {
+      if (editorFile !== file.id) {
+        assignEditorFile(file);
+        render("editor");
+      }
+      open("editor");
+      bodyFor("editor")?.querySelector(".editor-text")?.focus();
+      emitFile("file-open", file);
+    };
+    if (editorFile !== file.id && editorText !== editorSavedText) {
+      open("editor");
+      openForm("editor", "Ouvrir un autre document ?", "<p>Le texte en cours contient des modifications à enregistrer.</p>", "Ouvrir le fichier", () => {
+        load();
+        return "";
+      });
+      return;
+    }
+    load();
+  }
+
+  function explorerCommand(command) {
+    const current = byId(selectedFile);
+    if (command === "documents") navigate(rootId);
+    if (command === "up") navigate(byId(explorerFolder)?.parentId || rootId);
+    if (command === "open-trash") open("trash");
+    if (command === "open") openEntry(current);
+    if (command === "new-folder") editFolderName();
+    if (command === "rename" && current) editFolderName(current);
+    if (command === "cut" && current) cutFile(current);
+    if (command === "paste" && clipboard) pasteFile(explorerFolder);
+    if (command === "trash" && current) moveToTrash(current);
+  }
+
+  function validateFilename(name) {
+    if (!name || name === "." || name === ".." || /[/\\:*?"<>|]/.test(name)) {
+      return "Choisis un nom sans caractère interdit.";
+    }
+    return "";
+  }
+
+  function duplicate(name, parentId, excludedId) {
+    const normalized = name.toLocaleLowerCase("fr");
+    return contents(parentId)
+      .some((file) => file.id !== excludedId && file.name.toLocaleLowerCase("fr") === normalized);
+  }
+
+  function openForm(app, title, fields, submitLabel, submit) {
+    const body = bodyFor(app);
+    body.querySelector(".file-dialog")?.remove();
+    const form = document.createElement("form");
+    form.className = "file-dialog";
+    form.setAttribute("role", "dialog");
+    form.setAttribute("aria-labelledby", `file-dialog-title-${app}`);
+    form.innerHTML = `
+      <div class="file-dialog-card">
+        <h3 id="file-dialog-title-${app}">${title}</h3>
+        ${fields}
+        <p class="file-error" role="alert" hidden></p>
+        <div class="file-dialog-actions">
+          ${toolbarButton("dismiss", "Annuler", "close")}
+          <button type="submit" class="app-button is-primary">${submitLabel}</button>
+        </div>
+      </div>`;
+    const previous = document.activeElement;
+    function dismiss() {
+      form.remove();
+      if (previous?.isConnected) previous.focus();
+    }
+    form.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (event.target === form || event.target.closest('[data-command="dismiss"]')) dismiss();
+    });
+    form.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.stopPropagation();
+        dismiss();
+      }
+    });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const error = submit(new FormData(form));
+      if (error) {
+        const status = form.querySelector(".file-error");
+        status.textContent = error;
+        status.hidden = false;
+        return;
+      }
+      dismiss();
+    });
+    body.append(form);
+    const input = form.querySelector("input");
+    (input || form.querySelector("button"))?.focus();
+    input?.select();
+  }
+
+  function editFolderName(file) {
+    const creating = !file;
+    const title = creating ? "Nouveau dossier" : "Renommer";
+    const parentId = creating ? explorerFolder : file.parentId;
+    openForm("files", title, `
+      <label>Nom ${!file || file.kind === "folder" ? "du dossier" : "du fichier"}
+        <input type="text" name="filename" maxlength="65" autocomplete="off" value="${escapeHtml(file?.name || "")}" required>
+      </label>`, creating ? "Créer" : "Renommer", (data) => {
+      const name = String(data.get("filename")).trim();
+      const error = validateFilename(name);
+      if (error) return error;
+      if (duplicate(name, parentId, file?.id)) return "Ce nom est déjà utilisé dans ce dossier.";
+      let changed = file;
+      if (creating) {
+        changed = { id: idForNewFile(), name, kind: "folder", parentId };
+        files.push(changed);
+      } else {
+        file.name = name;
+      }
+      selectedFile = changed.id;
+      saveFiles();
+      render("files");
+      renderEditorStatus();
+      focusFile("files", changed.id);
+      const kind = changed.kind === "folder" ? "folder" : "file";
+      emitFile(`${kind}-${creating ? "create" : "rename"}`, changed);
+      return "";
+    });
+  }
+
+  function cutFile(file) {
+    clipboard = file.id;
+    bodyFor("files").querySelector('.app-toolbar [data-command="paste"]').disabled = false;
+    notify(`« ${file.name} » est prêt à être déplacé.`);
+    emitFile("file-cut", file);
+  }
+
+  function pasteFile(destination) {
+    const file = byId(clipboard);
+    if (!file || isTrashed(file)) {
+      clipboard = null;
+      render("files");
+      return;
+    }
+    if (file.parentId === destination) {
+      notify("Choisis un autre dossier pour déplacer cet élément.");
+      return;
+    }
+    if (inside(destination, file.id)) {
+      notify("Un dossier ne peut pas être déplacé à l’intérieur de lui-même.");
+      return;
+    }
+    if (duplicate(file.name, destination)) {
+      notify("Ce dossier contient déjà un élément avec ce nom.");
+      return;
+    }
+    file.parentId = destination;
+    selectedFile = file.id;
+    clipboard = null;
+    saveFiles();
+    render("files");
+    renderEditorStatus();
+    focusFile("files", file.id);
+    notify(`« ${file.name} » a été déplacé.`);
+    emitFile("file-move", file, { folderName: folderName(destination), method: "cut" });
+  }
+
+  function moveToTrash(file) {
+    file.trashed = true;
+    selectedFile = null;
+    if (clipboard === file.id) clipboard = null;
+    saveFiles();
+    render("files");
+    render("trash");
+    renderEditorStatus();
+    bodyFor("files")?.querySelector(".app-toolbar button")?.focus();
+    notify(`« ${file.name} » a été mis à la corbeille.`);
+    emitFile("file-trash", file);
+  }
+
+  function focusFile(app, id) {
+    const rows = bodyFor(app)?.querySelectorAll("[data-file-id]") || [];
+    Array.from(rows).find((row) => row.dataset.fileId === id)?.focus();
+  }
+
+  function renderTrash(body) {
+    const trashed = sorted(files.filter((file) => file.trashed));
+    const current = trashed.find((file) => file.id === selectedTrash);
+    body.innerHTML = `
+      <div class="app-toolbar">${toolbarButton("restore-file", "Restaurer", "restore", !current, true)}</div>
+      <div class="file-main">
+        <div class="file-path">Éléments supprimés</div>
+        <div class="file-list">
+          ${trashed.length
+            ? trashed.map((file) => fileRow(file, file === current, `<small>${escapeHtml(folderName(file.parentId))}</small>`)).join("")
+            : '<p class="empty-state">La corbeille est vide.</p>'}
+        </div>
+        <div class="app-status">Restaurer un élément le remet dans son dossier d’origine.</div>
+      </div>`;
+    body.onclick = (event) => {
+      const row = event.target.closest("[data-file-id]");
+      if (row) {
+        selectedTrash = row.dataset.fileId;
+        body.querySelectorAll("[data-file-id]").forEach((item) => {
+          const selected = item === row;
+          item.classList.toggle("is-selected", selected);
+          item.setAttribute("aria-pressed", String(selected));
+        });
+        body.querySelector('[data-command="restore-file"]').disabled = false;
+      }
+      if (event.target.closest('[data-command="restore-file"]')) restoreFile(byId(selectedTrash));
+    };
+  }
+
+  function restoreFile(file) {
+    if (!file?.trashed) return;
+    if (file.parentId !== rootId && isTrashed(byId(file.parentId))) {
+      notify("Restaure d’abord le dossier qui contenait cet élément.");
+      return;
+    }
+    if (duplicate(file.name, file.parentId)) {
+      notify("Un élément porte déjà ce nom dans le dossier d’origine.");
+      return;
+    }
+    delete file.trashed;
+    selectedTrash = null;
+    saveFiles();
+    render("trash");
+    render("files");
+    renderEditorStatus();
+    windows.get("trash")?.node.focus();
+    notify(`« ${file.name} » a été restauré dans ${folderName(file.parentId)}.`);
+    emitFile("file-restore", file, { folderName: folderName(file.parentId) });
+  }
+
+  function assignEditorFile(file) {
+    editorFile = file?.id || null;
+    editorText = file?.text || "";
+    editorSavedText = editorText;
+  }
+
+  function renderEditor(body) {
+    body.innerHTML = `
+      <div class="app-toolbar">
+        ${toolbarButton("new-file", "Nouveau", "plus")}
+        ${toolbarButton("save-file", "Enregistrer", "save", false, true)}
+        ${toolbarButton("save-as", "Enregistrer sous", "file")}
+        ${toolbarButton("download-file", "Télécharger", "download", true)}
+      </div>
+      <div class="editor-layout">
+        <textarea class="editor-text" aria-label="Contenu du document" placeholder="Écris ton texte ici…" spellcheck="false"></textarea>
+        <div class="app-status"></div>
+      </div>`;
+    const textArea = body.querySelector(".editor-text");
+    textArea.value = editorText;
+    textArea.addEventListener("input", () => {
+      editorText = textArea.value;
+      renderEditorStatus();
+      emit("editor-input", { text: editorText });
+    });
+    body.onclick = (event) => {
+      const command = event.target.closest("[data-command]")?.dataset.command;
+      if (command === "new-file") newEditorFile();
+      if (command === "save-file") saveEditor(false);
+      if (command === "save-as") saveEditor(true);
+      if (command === "download-file") downloadEditorFile();
+    };
+    body.onkeydown = (event) => {
+      if (event.target.closest(".file-dialog")) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        saveEditor(event.shiftKey);
+      }
+    };
+    renderEditorStatus();
+  }
+
+  function renderEditorStatus() {
+    const body = bodyFor("editor");
+    if (!body) return;
+    const file = byId(editorFile);
+    const location = file ? `${folderName(file.parentId)} / ${file.name}` : "Nouveau document";
+    const state = editorText === editorSavedText ? "" : " · Modifications à enregistrer";
+    body.querySelector(".app-status").textContent = `${location}${state}`;
+    body.querySelector('[data-command="download-file"]').disabled = !file || isTrashed(file) || Boolean(state);
+  }
+
+  function downloadEditorFile() {
+    const file = byId(editorFile);
+    if (!file || isTrashed(file) || editorText !== editorSavedText) return;
+    const url = URL.createObjectURL(new Blob([file.text], { type: "text/plain;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = file.name.toLowerCase().endsWith(".txt") ? file.name : `${file.name}.txt`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function newEditorFile() {
+    const resetEditor = () => {
+      assignEditorFile(null);
+      render("editor");
+      bodyFor("editor").querySelector(".editor-text").focus();
+    };
+    if (editorText === editorSavedText) {
+      resetEditor();
+      return;
+    }
+    openForm("editor", "Commencer un autre document ?", "<p>Le texte en cours contient des modifications à enregistrer.</p>", "Créer un document vide", () => {
+      resetEditor();
+      return "";
+    });
+  }
+
+  function saveEditor(saveAs) {
+    const current = byId(editorFile);
+    if (!saveAs && current && !isTrashed(current)) {
+      finishEditorSave(current);
+      return;
+    }
+    const folders = folderChoices();
+    const targetId = current && !isTrashed(current) ? current.parentId : rootId;
+    openForm("editor", "Enregistrer le document", `
+      <label>Nom du fichier
+        <input type="text" name="filename" maxlength="65" autocomplete="off" value="" required>
+      </label>
+      <label>Dossier
+        <select name="parentId">${folders
+          .map(({ id, label }) => `<option value="${escapeHtml(id)}"${id === targetId ? " selected" : ""}>${escapeHtml(label)}</option>`)
+          .join("")}</select>
+      </label>`, "Enregistrer", (data) => {
+      const typedName = String(data.get("filename")).trim();
+      const error = validateFilename(typedName);
+      if (error) return error;
+      const name = typedName.toLowerCase().endsWith(".txt") ? typedName : `${typedName}.txt`;
+      const parentId = String(data.get("parentId"));
+      if (duplicate(name, parentId)) return "Ce nom est déjà utilisé. Choisis un autre nom de fichier.";
+      const file = { id: idForNewFile(), kind: "file", name, parentId, text: "" };
+      files.push(file);
+      finishEditorSave(file);
+      return "";
+    });
+  }
+
+  function finishEditorSave(file) {
+    file.text = editorText;
+    editorFile = file.id;
+    editorSavedText = editorText;
+    saveFiles();
+    renderEditorStatus();
+    render("files");
+    notify(`« ${file.name} » a été enregistré dans ${folderName(file.parentId)}.`);
+    emitFile("file-save", file, { text: file.text, folderName: folderName(file.parentId) });
+  }
+
+  function renderMouse(body) {
+    body.innerHTML = `
+      <div class="practice-intro">Teste les quatre gestes sur les zones de l’atelier.</div>
+      <div class="mouse-grid">
+        <button type="button" class="mouse-tile" data-gesture="click">
+          ${icon("pointer", 24)}<strong>Cliquer</strong><span>Appuie une fois avec le bouton gauche.</span>
+        </button>
+        <button type="button" class="mouse-tile" data-gesture="double">
+          ${icon("pointer", 24)}<strong>Double-cliquer</strong><span>Appuie deux fois rapidement avec le bouton gauche.</span>
+        </button>
+        <button type="button" class="mouse-tile" data-gesture="right">
+          ${icon("menu", 24)}<strong>Faire un clic droit</strong><span>Appuie avec le bouton droit.</span>
+        </button>
+      </div>
+      <div class="mouse-drag-area">
+        <div><strong>Glisser-déposer</strong><p>Maintiens le clic sur l’étoile et relâche-la dans la cible.</p></div>
+        <button type="button" class="mouse-token" aria-label="Étoile à déplacer"><span aria-hidden="true">★</span></button>
+        <button type="button" class="mouse-drop" aria-label="Cible de dépôt">Dépose ici</button>
+      </div>
+      <div class="app-status" aria-live="polite">Les gestes réussis s’affichent ici.</div>
+      <div class="file-context mouse-practice-context" hidden>
+        ${toolbarButton("close-gesture", "Fermer le menu", "close")}
+      </div>`;
+
+    function succeed(gesture, target, message) {
+      target.classList.add("is-done");
+      body.querySelector(".app-status").textContent = message;
+      emit(`mouse-${gesture}`);
+    }
+
+    const click = body.querySelector('[data-gesture="click"]');
+    click.addEventListener("click", () => {
+      succeed("click", click, "Clic réussi.");
+    });
+    const doubleClick = body.querySelector('[data-gesture="double"]');
+    doubleClick.addEventListener("dblclick", () => {
+      succeed("double", doubleClick, "Double-clic réussi.");
+    });
+    const right = body.querySelector('[data-gesture="right"]');
+    const menu = body.querySelector(".mouse-practice-context");
+    function closePracticeMenu() {
+      menu.hidden = true;
+      right.focus();
+    }
+    right.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      const bounds = right.getBoundingClientRect();
+      placeContext(menu, body, event.clientX || bounds.left, event.clientY || bounds.bottom);
+      menu.querySelector("button").focus();
+      succeed("right", right, "Clic droit réussi. Tu as ouvert le menu de la cible.");
+    });
+    menu.addEventListener("click", closePracticeMenu);
+    menu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closePracticeMenu();
+    });
+    const token = body.querySelector(".mouse-token");
+    const drop = body.querySelector(".mouse-drop");
+    token.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      const startX = event.clientX;
+      const startY = event.clientY;
+      token.setPointerCapture(event.pointerId);
+      token.classList.add("is-dragging");
+      token.onpointermove = (move) => {
+        token.style.transform = `translate(${move.clientX - startX}px, ${move.clientY - startY}px)`;
+      };
+      const clear = () => {
+        token.style.transform = "";
+        token.classList.remove("is-dragging");
+        token.onpointermove = null;
+        token.onpointerup = null;
+        token.onpointercancel = null;
+      };
+      token.onpointercancel = clear;
+      token.onpointerup = (end) => {
+        clear();
+        const target = drop.getBoundingClientRect();
+        if (end.clientX >= target.left && end.clientX <= target.right &&
+            end.clientY >= target.top && end.clientY <= target.bottom) {
+          succeed("drag", drop, "Glisser-déposer réussi.");
+        }
+      };
+    });
+  }
+
+  function reset() {
+    for (const app of Array.from(windows.keys())) closeWindow(app, false);
+    files = initialFiles();
+    saveFiles();
+    clipboard = null;
+    selectedFile = null;
+    selectedTrash = null;
+    explorerFolder = rootId;
+    assignEditorFile(null);
+    setStart(false);
+    if (toast) toast.hidden = true;
+  }
+
+  desktopIcons?.addEventListener("click", (event) => {
+    const item = event.target.closest("[data-app]");
+    if (!item) return;
+    desktopIcons.querySelectorAll("[data-app]").forEach((button) => {
+      button.classList.toggle("is-selected", button === item);
+    });
+    if (event.detail === 0 || event.pointerType === "touch") open(item.dataset.app);
+  });
+  desktopIcons?.addEventListener("dblclick", (event) => {
+    const item = event.target.closest("[data-app]");
+    if (item) open(item.dataset.app);
+  });
+  startButton?.addEventListener("click", () => {
+    const opening = startMenu.hidden;
+    setStart(opening);
+    if (opening) startMenu.querySelector("button")?.focus();
+  });
+  startMenu?.addEventListener("click", (event) => {
+    const item = event.target.closest("[data-app]");
+    if (item) open(item.dataset.app);
+  });
+  document.addEventListener("pointerdown", (event) => {
+    if (startMenu && !startMenu.hidden && !startMenu.contains(event.target) && !startButton.contains(event.target)) {
+      setStart(false);
+    }
+    if (!event.target.closest(".file-context")) {
+      const menu = bodyFor("files")?.querySelector(".file-context");
+      if (menu) menu.hidden = true;
+      const practiceMenu = bodyFor("mouse")?.querySelector(".mouse-practice-context");
+      if (practiceMenu) practiceMenu.hidden = true;
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && startMenu && !startMenu.hidden) {
+      setStart(false);
+      startButton?.focus();
+    }
+  });
+  if (typeof ResizeObserver === "function" && layer) {
+    new ResizeObserver(() => {
+      for (const { node } of windows.values()) {
+        if (!node.hidden && !node.classList.contains("is-maximized")) {
+          placeWindow(node, ...windowPosition(node));
+        }
+      }
+    }).observe(layer);
+  }
+  window.Declic = { open, reset };
+})();
+</script>
+  <script>
+(() => {
+  const content = document.getElementById('mission-content');
+  const list = document.getElementById('mission-list');
+  const count = document.getElementById('mission-count');
+  const progress = document.getElementById('mission-progress');
+  const status = document.getElementById('mission-status');
+  const storageKey = 'declic.missions.v1';
+  const documentName = 'Ma première mission.txt';
+  const sampleText = 'Je découvre le clavier !';
+
+  const missions = [
+    {
+      title: 'Apprivoiser la souris',
+      description: 'Chaque geste sert à quelque chose. Entraîne-toi dans l’Atelier souris.',
+      app: 'mouse',
+      steps: [
+        ['click', 'Sélectionne la cible avec un clic.', 'Pose le pointeur sur la cible et appuie une fois sur le bouton gauche de la souris.'],
+        ['double', 'Fais un double-clic sur sa cible.', 'Appuie deux fois de suite, rapidement, sur le bouton gauche sans déplacer la souris.'],
+        ['right', 'Affiche le menu de la cible avec un clic droit.', 'Utilise le bouton droit. Sur certains pavés tactiles, un clic à deux doigts ouvre aussi le menu.'],
+        ['drag', 'Fais glisser l’objet dans la zone d’arrivée.', 'Maintiens le bouton gauche enfoncé sur l’objet, déplace-le jusqu’à la zone et relâche.'],
+      ],
+    },
+    {
+      title: 'Maîtriser les fenêtres',
+      description: 'Entraîne-toi avec l’Explorateur et repère à quoi servent les boutons en haut d’une fenêtre.',
+      steps: [
+        ['open', 'Ouvre l’Explorateur.', 'Repère l’icône Explorateur sur le bureau et double-clique dessus.'],
+        ['minimize', 'Réduis la fenêtre.', 'Clique sur le premier bouton en haut à droite. La fenêtre se range dans la barre des tâches.'],
+        ['restore', 'Affiche de nouveau la fenêtre réduite.', 'Clique sur Explorateur dans la barre des tâches, en bas du bureau.'],
+        ['maximize', 'Agrandis la fenêtre.', 'Clique sur le bouton Agrandir, entre les deux autres boutons en haut à droite.'],
+        ['close', 'Ferme la fenêtre.', 'Clique sur la croix en haut à droite de la fenêtre de l’Explorateur.'],
+      ],
+    },
+    {
+      title: 'Créer un dossier',
+      description: 'Prépare un endroit pour ranger ton travail de technologie.',
+      steps: [
+        ['createFolder', 'Crée un dossier Brouillon dans Documents.', 'Ouvre l’Explorateur, choisis Documents, puis Nouveau dossier. Saisis Brouillon.'],
+        ['renameFolder', 'Renomme le dossier Brouillon en Technologie.', 'Fais un clic droit sur le dossier Brouillon et choisis Renommer. Saisis Technologie.'],
+      ],
+    },
+    {
+      title: 'Écrire et enregistrer',
+      description: 'Utilise le clavier pour rédiger une phrase, puis garde une copie dans tes documents.',
+      steps: [
+        ['type', `Dans le Bloc-notes, saisis « ${sampleText} »`, 'Tiens la touche Maj enfoncée pendant que tu tapes J. Sur un clavier AZERTY, utilise la touche é pour la lettre accentuée.'],
+        ['save', `Enregistre le texte dans Documents sous « ${documentName} ».`, 'Clique sur Enregistrer, choisis Documents et donne un nom à ton fichier. L’extension .txt indique un document texte.'],
+      ],
+    },
+    {
+      title: 'Ranger un fichier',
+      description: 'Déplace le texte que tu as enregistré vers ton dossier de technologie.',
+      steps: [
+        ['cut', `Dans Documents, coupe le fichier « ${documentName} ».`, 'Dans l’Explorateur, utilise le clic droit sur ton fichier et choisis Couper.'],
+        ['paste', 'Colle le fichier dans Technologie.', 'Ouvre Technologie dans l’Explorateur. Clique sur Coller ou fais un clic droit dans un espace libre et choisis Coller.'],
+      ],
+    },
+    {
+      title: 'Récupérer un fichier',
+      description: 'Découvre comment retrouver un document mis à la corbeille.',
+      steps: [
+        ['trash', `Depuis Technologie, mets « ${documentName} » à la corbeille.`, 'Dans l’Explorateur, ouvre Technologie. Fais un clic droit sur le fichier et choisis Mettre à la corbeille.'],
+        ['recover', 'Ouvre la Corbeille et restaure ton fichier.', 'Ouvre la Corbeille depuis le bureau, sélectionne le fichier et clique sur Restaurer. Il revient dans Technologie.'],
+      ],
+    },
+  ];
+
+  function initialState() {
+    return { active: 0, done: {}, draftFolderId: null, folderId: null, fileId: null };
+  }
+
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey));
+      if (saved && Number.isInteger(saved.active) && missions[saved.active] && saved.done) {
+        return { ...initialState(), ...saved };
+      }
+    } catch {
+      // The training remains usable when the browser blocks storage.
+    }
+    return initialState();
+  }
+
+  let state = load();
+  let hintOpen = false;
+
+  function persist() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    } catch {
+      // Progress is still available while the page stays open.
+    }
+  }
+
+  function isComplete(mission) {
+    return mission.steps.every(([id]) => state.done[id]);
+  }
+
+  function isAvailable(index) {
+    return missions.slice(0, index).every(isComplete);
+  }
+
+  function render() {
+    const completed = missions.filter(isComplete).length;
+    const current = missions[state.active];
+    const pending = current.steps.find(([id]) => !state.done[id]);
+    const openButton = current.app && pending
+      ? '<button class="mission-open" type="button" data-mission-app="mouse">Ouvrir l’atelier</button>'
+      : '';
+    const hint = pending
+      ? `<button class="mission-hint-toggle" type="button" aria-controls="mission-hint" aria-expanded="${hintOpen}">${hintOpen ? 'Masquer l’indice' : 'Afficher un indice'}</button>`
+      : '';
+    const nextButton = !pending && state.active < missions.length - 1
+      ? `<button class="mission-next" type="button" data-mission-select="${state.active + 1}">Mission suivante</button>`
+      : '';
+    const completion = pending ? '' : `<p class="mission-completion">${completed === missions.length ? 'Parcours terminé. Les six missions sont réussies !' : 'Mission réussie !'}</p>`;
+
+    count.textContent = `${completed} / ${missions.length}`;
+    progress.value = completed;
+    content.innerHTML = `
+      <h2 id="mission-active-title" class="mission-card-heading" tabindex="-1">${current.title}</h2>
+      <p class="mission-description">${current.description}</p>
+      <ol class="mission-steps">
+        ${current.steps.map(([id, label]) => {
+          const done = Boolean(state.done[id]);
+          const next = id === pending?.[0];
+          return `<li class="mission-step${done ? ' is-done' : ''}${next ? ' is-current' : ''}"${next ? ' aria-current="step"' : ''} aria-label="${done ? 'Étape réussie. ' : ''}${label}"><span class="mission-check" aria-hidden="true">${done ? '✓' : ''}</span><span class="mission-step-text">${label}</span></li>`;
+        }).join('')}
+      </ol>
+      ${completion}
+      ${openButton || hint || nextButton ? `<div class="mission-actions">${openButton}${hint}${nextButton}</div>` : ''}
+      ${pending ? `<p id="mission-hint" class="mission-hint"${hintOpen ? '' : ' hidden'}>${pending[2]}</p>` : ''}`;
+
+    list.innerHTML = missions.map((mission, index) => {
+      const active = index === state.active;
+      const done = isComplete(mission);
+      const available = isAvailable(index);
+      return `<button class="mission-item${active ? ' is-active' : ''}${done ? ' is-done' : ''}" type="button" data-mission-select="${index}"${active ? ' aria-current="step"' : ''}${available ? '' : ' disabled'} aria-label="Mission ${index + 1}. ${mission.title}${done ? '. Réussie' : available ? '' : '. Termine les missions précédentes pour y accéder'}"><span class="mission-item-number" aria-hidden="true">${index + 1}</span><span class="mission-item-label">${mission.title}</span><span class="mission-item-status" aria-hidden="true">${done ? '✓' : ''}</span></button>`;
+    }).join('');
+  }
+
+  function select(index) {
+    if (!missions[index] || !isAvailable(index)) return;
+    state.active = index;
+    hintOpen = false;
+    persist();
+    render();
+    document.getElementById('mission-active-title').focus({ preventScroll: true });
+  }
+
+  function normalizeName(name) {
+    return String(name ?? '').trim().normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+  }
+
+  function isSampleText(text) {
+    const trim = (value) => value.normalize('NFC').trim().replace(/\s+/g, ' ').replace(/ !$/, '!');
+    return typeof text === 'string' && trim(text) === trim(sampleText);
+  }
+
+  function mark(id) {
+    if (state.done[id]) return false;
+    state.done[id] = true;
+    return true;
+  }
+
+  function checkAction(action) {
+    const { type, app, name, id, parentId, text } = action;
+    switch (type) {
+      case 'mouse-click': return mark('click');
+      case 'mouse-double': return mark('double');
+      case 'mouse-right': return mark('right');
+      case 'mouse-drag': return mark('drag');
+      case 'window-open': return app === 'files' && mark('open');
+      case 'window-minimize': return app === 'files' && mark('minimize');
+      case 'window-restore': return app === 'files' && mark('restore');
+      case 'window-maximize': return app === 'files' && mark('maximize');
+      case 'window-close': return app === 'files' && mark('close');
+      case 'folder-create': {
+        if (parentId !== 'documents' || normalizeName(name) !== 'brouillon' || state.done.renameFolder) return false;
+        if (state.draftFolderId === id) return false;
+        state.draftFolderId = id;
+        mark('createFolder');
+        return true;
+      }
+      case 'folder-rename': {
+        if (parentId !== 'documents' || id !== state.draftFolderId || normalizeName(name) !== 'technologie') return false;
+        state.folderId = id;
+        return mark('renameFolder');
+      }
+      case 'editor-input': return isSampleText(text) && mark('type');
+      case 'file-save': {
+        if (parentId !== 'documents' || normalizeName(name) !== normalizeName(documentName) || !isSampleText(text)) return false;
+        mark('type');
+        if (state.done.paste || state.fileId === id) return false;
+        state.fileId = id;
+        mark('save');
+        return true;
+      }
+      case 'file-cut': return id === state.fileId && parentId === 'documents' && mark('cut');
+      case 'file-move': {
+        if (id !== state.fileId || parentId !== state.folderId || action.method !== 'cut') return false;
+        mark('cut');
+        return mark('paste');
+      }
+      case 'file-trash': return id === state.fileId && state.done.paste && mark('trash');
+      case 'file-restore': return id === state.fileId && state.done.trash && (!parentId || parentId === state.folderId) && mark('recover');
+      default: return false;
+    }
+  }
+
+  function onAction(event) {
+    if (!event.detail) return;
+    const current = missions[state.active];
+    const previousStep = current.steps.findIndex(([id]) => !state.done[id]);
+    if (!checkAction(event.detail)) return;
+    const nextStep = current.steps.findIndex(([id]) => !state.done[id]);
+    persist();
+    render();
+    if (nextStep !== previousStep) {
+      status.textContent = nextStep === -1 ? `Mission réussie. ${current.title}.` : `Étape réussie. ${current.steps[nextStep][1]}`;
+    }
+  }
+
+  function onPanelClick(event) {
+    const button = event.target.closest('button');
+    if (!button) return;
+    if (button.hasAttribute('data-mission-select')) {
+      select(Number(button.dataset.missionSelect));
+    } else if (button.hasAttribute('data-mission-app')) {
+      window.Declic?.open(button.dataset.missionApp);
+    } else if (button.classList.contains('mission-hint-toggle')) {
+      hintOpen = !hintOpen;
+      button.setAttribute('aria-expanded', String(hintOpen));
+      button.textContent = hintOpen ? 'Masquer l’indice' : 'Afficher un indice';
+      document.getElementById('mission-hint').hidden = !hintOpen;
+    }
+  }
+
+  content.addEventListener('click', onPanelClick);
+  list.addEventListener('click', onPanelClick);
+  window.addEventListener('declic:action', onAction);
+  document.addEventListener('declic:action', onAction);
+  window.DeclicMissions = {
+    select,
+    reset() {
+      state = initialState();
+      hintOpen = false;
+      persist();
+      render();
+      status.textContent = 'Le parcours a été réinitialisé.';
+    },
+  };
+
+  if (!isAvailable(state.active)) state.active = 0;
+  render();
+})();
+</script>
+</body>
+</html>
