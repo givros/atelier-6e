@@ -16,6 +16,7 @@
     </div>
     <div class="page-tools">
       <span class="grade"><span data-icon="laptop"></span> Classe de 6e</span>
+      <a class="header-button mode-link" id="mode-link" href="?mode=eval"><span data-icon="flag"></span><span>Éval /20</span></a>
       <button class="header-button screen-button" type="button" id="screen-button" aria-label="Agrandir le bureau" title="Agrandir le bureau" aria-controls="missions-panel" aria-expanded="true"><span data-screen-icon data-icon="expand"></span><span data-screen-label>Bureau seul</span></button>
       <button class="header-button" type="button" id="help-button"><span data-icon="help"></span><span>Aide</span></button>
     </div>
@@ -79,7 +80,7 @@
     <aside id="missions-panel" class="missions-panel" aria-labelledby="missions-title">
       <header class="missions-header">
         <div class="missions-header-row">
-          <h2 id="missions-title"><span class="missions-mark" data-icon="flag"></span> Tes missions</h2>
+          <h2 id="missions-title"><span class="missions-mark" data-icon="flag"></span><span id="missions-label">Tes missions</span></h2>
           <span class="mission-count" id="mission-count">0</span>
         </div>
         <progress id="mission-progress" value="0" aria-label="Missions réussies"></progress>
@@ -101,7 +102,7 @@
     <ul class="help-tips">
       <li><strong>Sur le bureau</strong><span>Un clic sélectionne une icône. Deux clics rapides l’ouvrent.</span></li>
       <li><strong>Dans la barre des tâches</strong><span>Clique sur Démarrer pour chercher une application. Une fenêtre réduite reste accessible par son icône dans la barre du bas.</span></li>
-      <li><strong>Pour les missions</strong><span>Choisis un atelier. Clique sur « Afficher un indice » si tu bloques. Tes fichiers et ta progression restent sur ce navigateur.</span></li>
+      <li id="help-mission-tip"><strong>Pour les missions</strong><span>Choisis un atelier. Clique sur « Afficher un indice » si tu bloques. Tes fichiers et ta progression restent sur ce navigateur.</span></li>
     </ul>
     <div class="dialog-footer"><button id="reset-button" class="header-button" type="button"><span data-icon="reset"></span> Recommencer le parcours</button></div>
   </dialog>
@@ -113,8 +114,10 @@
   <noscript><p class="noscript">Active JavaScript dans ton navigateur pour utiliser le bureau et faire les missions.</p></noscript>
   <script>/* SHELL SCRIPT */</script>
   <script>/* PHOTO DATA */</script>
+  <script>/* ASSESSMENT SCRIPT */</script>
   <script>/* MAIL SCRIPT */</script>
   <script>/* CORE SCRIPT */</script>
+  <script>/* CHALLENGES SCRIPT */</script>
   <script>/* MISSIONS SCRIPT */</script>
 </body>
 </html>

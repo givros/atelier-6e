@@ -24,8 +24,9 @@
   const startSearch = document.getElementById("start-search");
   const startEmpty = document.getElementById("start-empty");
   const toast = document.getElementById("toast");
-  const storeKey = "declic-os-files-v1";
-  const workspaceKey = "declic-os-workspace-v1";
+  const evaluation = document.documentElement.dataset.mode === "eval";
+  const storeKey = evaluation ? "declic-os-eval-files-v1" : "declic-os-files-v1";
+  const workspaceKey = evaluation ? "declic-os-eval-workspace-v1" : "declic-os-workspace-v1";
   const rootId = "documents";
   const practiceRoot = "practice-home";
   const practiceLocations = ["practice-inbox", "practice-work", "practice-images", "practice-archive", "practice-mail"];
@@ -48,6 +49,7 @@
   let toastTimer;
 
   function initialFiles() {
+    if (evaluation) return practiceFiles();
     return [
       { id: "example-folder", name: "Mes exemples", kind: "folder", parentId: rootId },
       {
@@ -69,7 +71,7 @@
   }
 
   function practiceFiles() {
-    return [
+    const folders = [
       { id: practiceRoot, name: "Ateliers 6e", kind: "folder", parentId: rootId },
       { id: "practice-inbox", name: "À classer", kind: "folder", parentId: practiceRoot },
       { id: "practice-work", name: "Travaux", kind: "folder", parentId: practiceRoot },
@@ -77,6 +79,10 @@
       { id: "practice-archive", name: "Archives", kind: "folder", parentId: practiceRoot },
       { id: "practice-mail", name: "Courriels", kind: "folder", parentId: practiceRoot },
       { id: "practice-review", name: "À revoir", kind: "folder", parentId: "practice-work" },
+    ];
+    if (evaluation) return folders.concat(window.DeclicAssessment.fixtures());
+    return [
+      ...folders,
       { id: "practice-brief", name: "Consignes du club.txt", kind: "file", parentId: "practice-work", text: "Apporte un cahier et un crayon pour la prochaine rencontre du club." },
       { id: "practice-draft", name: "Brouillon sortie.txt", kind: "file", parentId: "practice-work", text: "Nous avons pris des photos et noté les animaux que nous avons vus pendant la sortie." },
       { id: "practice-plan", name: "Plan du club.txt", kind: "file", parentId: "practice-inbox", text: "Retrouvons-nous à la bibliothèque, à côté des fenêtres." },
@@ -84,6 +90,10 @@
       { id: "practice-test", name: "Essai de clavier.txt", kind: "file", parentId: "practice-inbox", text: "Ceci est un essai de saisie." },
       { id: "practice-lost", name: "Liste du matériel.txt", kind: "file", parentId: "practice-archive", text: "Un cahier, un crayon et une gomme.", trashed: true },
       { id: "practice-agenda", name: "Programme de la semaine.txt", kind: "file", parentId: "practice-work", text: "Lundi : préparer la sortie. Jeudi : ranger les photos." },
+      { id: "challenge-cdi", name: "Programme CDI.txt", kind: "file", parentId: "practice-inbox", text: "Mardi : découverte du CDI. Jeudi : choix d’un livre." },
+      { id: "challenge-reading", name: "Liste lecture brouillon.txt", kind: "file", parentId: "practice-archive", text: "Pour le club : un roman d’aventure, une bande dessinée et un album.", trashed: true },
+      { id: "challenge-obsolete", name: "Ancienne liste du club.txt", kind: "file", parentId: "practice-inbox", text: "Ancienne liste du club de lecture." },
+      { id: "challenge-trip", name: "Brouillon sortie CDI.txt", kind: "file", parentId: "practice-inbox", text: "Rendez-vous au CDI à 10 h. Pense à prendre ton carnet.", trashed: true },
     ];
   }
 
@@ -1389,5 +1399,9 @@
   }
   if (taskList) pinnedApps.forEach(taskFor);
   syncDesktopPeekButton();
-  window.Declic = { open, reset };
+  window.Declic = {
+    open,
+    reset,
+    inspectFiles: () => files.map((file) => ({ ...file, trashed: isTrashed(file) })),
+  };
 })();

@@ -1,4 +1,18 @@
 (() => {
+  const evaluation = new URLSearchParams(window.location.search).get('mode') === 'eval';
+  document.documentElement.dataset.mode = evaluation ? 'eval' : 'training';
+  if (evaluation) {
+    const modeLink = document.getElementById('mode-link');
+    modeLink.setAttribute('href', '?');
+    modeLink.lastElementChild.textContent = 'Entraînement';
+    document.title = 'Déclic OS · Évaluation d’entraînement';
+    document.getElementById('missions-label').textContent = 'Évaluation';
+    document.querySelector('#help-mission-tip strong').textContent = 'Pour l’évaluation';
+    document.querySelector('#help-mission-tip span').textContent = 'Lis les consignes, réalise les manipulations, puis affiche ta note sur 20.';
+    document.getElementById('reset-button').lastChild.textContent = ' Recommencer l’évaluation';
+    document.getElementById('reset-title').textContent = 'Recommencer l’évaluation ?';
+    document.querySelector('#reset-dialog p').textContent = 'Les fichiers et le résultat de cette évaluation seront effacés.';
+  }
   const symbols = {
     logo: '<rect x="3" y="4" width="18" height="13" rx="3"/><path d="M8 21h8m-4-4v4m-2-12 3 2-3 2"/>',
     laptop: '<rect x="4" y="4" width="16" height="12" rx="2"/><path d="M2 20h20m-14 0h8"/>',
@@ -93,8 +107,11 @@
     button.addEventListener('click', () => button.closest('dialog').close());
   });
   document.getElementById('confirm-reset').addEventListener('click', () => {
-    window.Declic.reset();
-    window.DeclicMissions.reset();
+    if (evaluation) window.DeclicAssessment.reset();
+    else {
+      window.Declic.reset();
+      window.DeclicMissions.reset();
+    }
     resetDialog.close();
     helpButton.focus();
   });
@@ -102,11 +119,11 @@
   const screenButton = document.getElementById('screen-button');
   screenButton.addEventListener('click', () => {
     const expanded = document.body.classList.toggle('desktop-expanded');
-    const label = expanded ? 'Réafficher les missions' : 'Agrandir le bureau';
+    const label = expanded ? `Réafficher ${evaluation ? 'l’évaluation' : 'les missions'}` : 'Agrandir le bureau';
     screenButton.setAttribute('aria-label', label);
     screenButton.setAttribute('aria-expanded', String(!expanded));
     screenButton.title = label;
     screenButton.querySelector('[data-screen-icon]').innerHTML = window.icon(expanded ? 'shrink' : 'expand', 18);
-    screenButton.querySelector('[data-screen-label]').textContent = expanded ? 'Voir les missions' : 'Bureau seul';
+    screenButton.querySelector('[data-screen-label]').textContent = expanded ? `Voir ${evaluation ? 'l’évaluation' : 'les missions'}` : 'Bureau seul';
   });
 })();

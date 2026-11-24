@@ -1,4 +1,6 @@
 (() => {
+  if (document.documentElement.dataset.mode === 'eval') return;
+
   const content = document.getElementById('mission-content');
   const list = document.getElementById('mission-list');
   const count = document.getElementById('mission-count');
@@ -311,13 +313,16 @@
   ];
 
   missions.push(...workshops);
+  const practiceCount = missions.length;
+  missions.push(...window.DeclicChallenges.map((mission) => ({ ...mission, challenge: true })));
 
   const groups = [
     { title: 'Premiers pas', start: 0, end: 6 },
     { title: 'Fichiers et dossiers', start: 6, end: 13 },
     { title: 'Documents texte', start: 13, end: 16 },
     { title: 'Photos et images', start: 16, end: 19 },
-    { title: 'Clavier et e-mails', start: 19, end: missions.length },
+    { title: 'Clavier et e-mails', start: 19, end: practiceCount },
+    { title: 'Défis progressifs', start: practiceCount, end: missions.length },
   ];
 
   const appLabels = {
@@ -354,6 +359,7 @@
   let state = load();
   if (Array.isArray(state.pastedFields)) state.pastedFields.forEach((field) => pastedFields.add(field));
   let hintOpen = false;
+  let challengeChecked = false;
 
   function persist() {
     try {
@@ -381,10 +387,18 @@
     ));
   }
 
+  function challengeChecks(mission) {
+    const files = window.Declic.inspectFiles();
+    return new Set(mission.steps.filter(([, , , check]) => check(files)).map(([id]) => id));
+  }
+
   function render() {
     const completed = missions.filter(isComplete).length;
     const current = missions[state.active];
-    const pending = current.steps.find(([id]) => !state.done[id]);
+    const passed = isComplete(current);
+    const checks = current.challenge && challengeChecked && !passed ? challengeChecks(current) : null;
+    const stepDone = (id) => Boolean(state.done[id] || checks?.has(id));
+    const pending = current.steps.find(([id]) => !stepDone(id));
     const app = pending && (pending[4] || current.app);
     const openButton = app
       ? `<button class="mission-open" type="button" data-mission-app="${app}">${appLabels[app]}</button>`
@@ -392,10 +406,17 @@
     const hint = pending
       ? `<button class="mission-hint-toggle" type="button" aria-controls="mission-hint" aria-expanded="${hintOpen}">${hintOpen ? 'Masquer l’indice' : 'Afficher un indice'}</button>`
       : '';
-    const nextButton = !pending && state.active < missions.length - 1
-      ? `<button class="mission-next" type="button" data-mission-select="${state.active + 1}">Mission suivante</button>`
+    let nextAction = '';
+    if (passed) {
+      nextAction = state.active < missions.length - 1
+        ? `<button class="mission-next" type="button" data-mission-select="${state.active + 1}">Mission suivante</button>`
+        : '<a class="mission-next" id="mission-evaluation" href="?mode=eval">Passer à l’Éval /20</a>';
+    }
+    const verifyButton = current.challenge && !passed
+      ? '<button class="mission-next" type="button" id="mission-verify">Vérifier le défi</button>'
       : '';
-    const completion = pending ? '' : `<p class="mission-completion">${completed === missions.length ? 'Parcours terminé. Toutes les missions sont réussies !' : 'Mission réussie !'}</p>`;
+    const completion = passed ? `<p class="mission-completion">${completed === missions.length ? 'Parcours terminé. Toutes les missions sont réussies !' : 'Mission réussie !'}</p>` : '';
+    const feedback = checks ? `<p id="mission-verify-feedback" class="mission-verify-feedback">${checks.size} / ${current.steps.length} objectifs prêts.</p>` : '';
 
     count.textContent = `${completed} / ${missions.length}`;
     progress.max = missions.length;
@@ -405,14 +426,15 @@
       <p class="mission-description">${current.description}</p>
       <ol class="mission-steps">
         ${current.steps.map(([id, description]) => {
-          const done = Boolean(state.done[id]);
+          const done = stepDone(id);
           const next = id === pending?.[0];
           const label = escapeHtml(stepText(description));
           return `<li class="mission-step${done ? ' is-done' : ''}${next ? ' is-current' : ''}"${next ? ' aria-current="step"' : ''} aria-label="${done ? 'Étape réussie. ' : ''}${label}"><span class="mission-check" aria-hidden="true">${done ? '✓' : ''}</span><span class="mission-step-text">${label}</span></li>`;
         }).join('')}
       </ol>
       ${completion}
-      ${openButton || hint || nextButton ? `<div class="mission-actions">${openButton}${hint}${nextButton}</div>` : ''}
+      ${feedback}
+      ${openButton || hint || nextAction || verifyButton ? `<div class="mission-actions">${openButton}${hint}${verifyButton || nextAction}</div>` : ''}
       ${pending ? `<p id="mission-hint" class="mission-hint"${hintOpen ? '' : ' hidden'}>${escapeHtml(stepText(pending[2]))}</p>` : ''}
       ${current.keyboard && pending ? '<p class="mission-typing-feedback" id="mission-typing-feedback" role="status" hidden></p>' : ''}`;
 
@@ -440,6 +462,7 @@
     if (!missions[index] || !isAvailable(index)) return;
     state.active = index;
     hintOpen = false;
+    challengeChecked = false;
     persist();
     render();
     document.getElementById('mission-active-title').focus({ preventScroll: true });
@@ -523,6 +546,7 @@
     }
     if (!changed) {
       if (typingChanged) persist();
+      if (current.challenge && challengeChecked && isFileAction && !isComplete(current)) render();
       const feedback = document.getElementById('mission-typing-feedback');
       if (feedback && ['editor-input', 'mail-input'].includes(action.type)) {
         const field = action.type === 'editor-input' ? 'editor' : action.field;
@@ -540,10 +564,29 @@
     }
   }
 
+  function verifyChallenge() {
+    const current = missions[state.active];
+    if (!current.challenge || isComplete(current)) return;
+    const checks = challengeChecks(current);
+    challengeChecked = true;
+    hintOpen = false;
+    if (checks.size === current.steps.length) {
+      checks.forEach(mark);
+      persist();
+      status.textContent = `Défi réussi. ${current.title}.`;
+    } else {
+      status.textContent = `${checks.size} objectifs prêts sur ${current.steps.length}.`;
+    }
+    render();
+    (document.getElementById('mission-verify') || document.getElementById('mission-active-title')).focus({ preventScroll: true });
+  }
+
   function onPanelClick(event) {
     const button = event.target.closest('button');
     if (!button) return;
-    if (button.hasAttribute('data-mission-select')) {
+    if (button.id === 'mission-verify') {
+      verifyChallenge();
+    } else if (button.hasAttribute('data-mission-select')) {
       select(Number(button.dataset.missionSelect));
     } else if (button.hasAttribute('data-mission-app')) {
       window.Declic?.open(button.dataset.missionApp);
@@ -577,6 +620,7 @@
     reset() {
       state = initialState();
       hintOpen = false;
+      challengeChecked = false;
       pastedFields.clear();
       persist();
       render();

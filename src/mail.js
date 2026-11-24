@@ -2,7 +2,7 @@
   "use strict";
 
   const fieldNames = ["recipient", "subject", "body"];
-  const storageKey = "declic-os-mail-v1";
+  const storageKey = document.documentElement.dataset.mode === "eval" ? "declic-os-eval-mail-v1" : "declic-os-mail-v1";
   let { draft, sent } = load();
 
   function emptyDraft() {
@@ -163,5 +163,5 @@
     updateStatus();
   }
 
-  window.DeclicMail = { render, reset };
+  window.DeclicMail = { render, reset, inspect: () => ({ draft: { ...draft }, sent }) };
 })();

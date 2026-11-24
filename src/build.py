@@ -9,8 +9,10 @@ template = (source / "shell.html").read_text(encoding="utf-8")
 for marker, filename in {
     "STYLES": "style.css",
     "SHELL SCRIPT": "shell.js",
+    "ASSESSMENT SCRIPT": "assessment.js",
     "MAIL SCRIPT": "mail.js",
     "CORE SCRIPT": "core.js",
+    "CHALLENGES SCRIPT": "challenges.js",
     "MISSIONS SCRIPT": "missions.js",
 }.items():
     content = (source / filename).read_text(encoding="utf-8").strip()
