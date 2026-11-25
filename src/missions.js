@@ -44,9 +44,11 @@
     },
     {
       title: 'Écrire et enregistrer',
-      description: 'Utilise le clavier pour rédiger une phrase, puis garde une copie dans tes documents.',
+      description: 'Tape ou colle la phrase dans le Bloc-notes, puis enregistre ton document.',
+      app: 'editor',
+      sample: sampleText,
       steps: [
-        ['type', `Dans le Bloc-notes, saisis « ${sampleText} »`, 'Tiens la touche Maj enfoncée pendant que tu tapes J. Sur un clavier AZERTY, utilise la touche é pour la lettre accentuée.'],
+        ['type', 'Saisis la phrase ci-dessus dans le Bloc-notes.', 'Clique sur Copier la phrase, puis sur Coller la phrase dans le Bloc-notes. Tu peux aussi taper la phrase au clavier.'],
         ['save', `Enregistre le texte dans Documents sous « ${documentName} ».`, 'Clique sur Enregistrer et choisis Documents. Si tu l’as déjà enregistré dans un autre dossier, clique sur Enregistrer sous.'],
       ],
     },
@@ -403,6 +405,12 @@
     const openButton = app
       ? `<button class="mission-open" type="button" data-mission-app="${app}">${appLabels[app]}</button>`
       : '';
+    const sample = !passed && current.sample
+      ? `<p class="mission-sample">${escapeHtml(current.sample)}</p>`
+      : '';
+    const copyButton = sample
+      ? '<button class="mission-hint-toggle" type="button" id="mission-copy-phrase">Copier la phrase</button>'
+      : '';
     const hint = pending
       ? `<button class="mission-hint-toggle" type="button" aria-controls="mission-hint" aria-expanded="${hintOpen}">${hintOpen ? 'Masquer l’indice' : 'Afficher un indice'}</button>`
       : '';
@@ -424,6 +432,7 @@
     content.innerHTML = `
       <h2 id="mission-active-title" class="mission-card-heading" tabindex="-1">${current.title}</h2>
       <p class="mission-description">${current.description}</p>
+      ${sample}
       <ol class="mission-steps">
         ${current.steps.map(([id, description]) => {
           const done = stepDone(id);
@@ -434,7 +443,7 @@
       </ol>
       ${completion}
       ${feedback}
-      ${openButton || hint || nextAction || verifyButton ? `<div class="mission-actions">${openButton}${hint}${verifyButton || nextAction}</div>` : ''}
+      ${openButton || copyButton || hint || nextAction || verifyButton ? `<div class="mission-actions">${openButton}${copyButton}${hint}${verifyButton || nextAction}</div>` : ''}
       ${pending ? `<p id="mission-hint" class="mission-hint"${hintOpen ? '' : ' hidden'}>${escapeHtml(stepText(pending[2]))}</p>` : ''}
       ${current.keyboard && pending ? '<p class="mission-typing-feedback" id="mission-typing-feedback" role="status" hidden></p>' : ''}`;
 
@@ -460,6 +469,7 @@
 
   function select(index) {
     if (!missions[index] || !isAvailable(index)) return;
+    if (index !== state.active) window.Declic.copyEditorText('');
     state.active = index;
     hintOpen = false;
     challengeChecked = false;
@@ -586,6 +596,12 @@
     if (!button) return;
     if (button.id === 'mission-verify') {
       verifyChallenge();
+    } else if (button.id === 'mission-copy-phrase') {
+      const text = missions[state.active].sample;
+      window.Declic.copyEditorText(text);
+      navigator.clipboard?.writeText?.(text)?.catch(() => {});
+      window.Declic.open('editor');
+      status.textContent = 'Phrase copiée. Clique sur Coller la phrase dans le Bloc-notes.';
     } else if (button.hasAttribute('data-mission-select')) {
       select(Number(button.dataset.missionSelect));
     } else if (button.hasAttribute('data-mission-app')) {

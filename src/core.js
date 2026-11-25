@@ -46,6 +46,7 @@
   let editorFile = null;
   let editorText = "";
   let editorSavedText = "";
+  let editorClipboard = "";
   let toastTimer;
 
   function initialFiles() {
@@ -334,7 +335,12 @@
     state.minimized = false;
     state.node.hidden = false;
     setActive(app);
-    if (focus) state.node.focus({ preventScroll: true });
+    if (focus) {
+      const textArea = app === "editor" && !state.node.querySelector(".file-dialog")
+        ? state.node.querySelector(".editor-text")
+        : null;
+      (textArea || state.node).focus({ preventScroll: true });
+    }
     if (wasHidden && !state.node.classList.contains("is-maximized")) {
       placeWindow(state.node, ...windowPosition(state.node));
     }
@@ -987,10 +993,16 @@
     saveWorkspace();
   }
 
+  function copyEditorText(text) {
+    editorClipboard = text;
+    renderEditorStatus();
+  }
+
   function renderEditor(body) {
     body.innerHTML = `
       <div class="app-toolbar">
         ${toolbarButton("new-file", "Nouveau", "plus")}
+        ${toolbarButton("paste-text", "Coller la phrase", "paste")}
         ${toolbarButton("save-file", "Enregistrer", "save", false, true)}
         ${toolbarButton("save-as", "Enregistrer sous", "file")}
         ${toolbarButton("download-file", "Télécharger", "download", true)}
@@ -1012,6 +1024,11 @@
     body.onclick = (event) => {
       const command = event.target.closest("[data-command]")?.dataset.command;
       if (command === "new-file") newEditorFile();
+      if (command === "paste-text" && editorClipboard) {
+        textArea.setRangeText(editorClipboard, textArea.selectionStart, textArea.selectionEnd, "end");
+        textArea.focus();
+        readEditorInput("insertFromPaste", false);
+      }
       if (command === "save-file") saveEditor(false);
       if (command === "save-as") saveEditor(true);
       if (command === "download-file") downloadEditorFile();
@@ -1033,6 +1050,7 @@
     const location = file ? `${folderName(file.parentId)} / ${file.name}` : "Nouveau document";
     const state = editorText === editorSavedText ? "" : " · Modifications à enregistrer";
     body.querySelector(".app-status").textContent = `${location}${state}`;
+    body.querySelector('[data-command="paste-text"]').hidden = !editorClipboard;
     body.querySelector('[data-command="download-file"]').disabled = !file || isTrashed(file) || Boolean(state);
   }
 
@@ -1314,6 +1332,7 @@
     files = initialFiles();
     saveFiles();
     clipboard = null;
+    editorClipboard = "";
     draggedFile = null;
     imageSource = "cat";
     imageFile = null;
@@ -1402,6 +1421,7 @@
   window.Declic = {
     open,
     reset,
+    copyEditorText,
     inspectFiles: () => files.map((file) => ({ ...file, trashed: isTrashed(file) })),
   };
 })();

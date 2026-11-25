@@ -169,6 +169,7 @@ button svg, [data-icon] svg { display: block; flex-shrink: 0; }
 .mission-content { padding: 16px 18px; background: #f8faff; border-bottom: 1px solid #e3eaf5; }
 .mission-card-heading { margin: 0; font-size: 1.23rem; line-height: 1.18; letter-spacing: -.031em; }
 .mission-description { margin: 8px 0 12px; font-size: .91rem; line-height: 1.38; }
+.mission-sample { margin: 0 0 10px; padding: 7px 9px; border: 1px solid #d5e0ff; border-radius: 7px; background: #fff; font-size: .91rem; }
 .mission-steps { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
 .mission-step { display: flex; align-items: flex-start; gap: 8px; padding: 5px 6px; border: 1px solid transparent; border-radius: 8px; font-size: .875rem; line-height: 1.25; }
 .mission-step.is-current { background: #eaf0ff; border-color: #d5e0ff; }
@@ -1263,6 +1264,7 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
   let editorFile = null;
   let editorText = "";
   let editorSavedText = "";
+  let editorClipboard = "";
   let toastTimer;
 
   function initialFiles() {
@@ -1551,7 +1553,12 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     state.minimized = false;
     state.node.hidden = false;
     setActive(app);
-    if (focus) state.node.focus({ preventScroll: true });
+    if (focus) {
+      const textArea = app === "editor" && !state.node.querySelector(".file-dialog")
+        ? state.node.querySelector(".editor-text")
+        : null;
+      (textArea || state.node).focus({ preventScroll: true });
+    }
     if (wasHidden && !state.node.classList.contains("is-maximized")) {
       placeWindow(state.node, ...windowPosition(state.node));
     }
@@ -2204,10 +2211,16 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     saveWorkspace();
   }
 
+  function copyEditorText(text) {
+    editorClipboard = text;
+    renderEditorStatus();
+  }
+
   function renderEditor(body) {
     body.innerHTML = `
       <div class="app-toolbar">
         ${toolbarButton("new-file", "Nouveau", "plus")}
+        ${toolbarButton("paste-text", "Coller la phrase", "paste")}
         ${toolbarButton("save-file", "Enregistrer", "save", false, true)}
         ${toolbarButton("save-as", "Enregistrer sous", "file")}
         ${toolbarButton("download-file", "Télécharger", "download", true)}
@@ -2229,6 +2242,11 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     body.onclick = (event) => {
       const command = event.target.closest("[data-command]")?.dataset.command;
       if (command === "new-file") newEditorFile();
+      if (command === "paste-text" && editorClipboard) {
+        textArea.setRangeText(editorClipboard, textArea.selectionStart, textArea.selectionEnd, "end");
+        textArea.focus();
+        readEditorInput("insertFromPaste", false);
+      }
       if (command === "save-file") saveEditor(false);
       if (command === "save-as") saveEditor(true);
       if (command === "download-file") downloadEditorFile();
@@ -2250,6 +2268,7 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     const location = file ? `${folderName(file.parentId)} / ${file.name}` : "Nouveau document";
     const state = editorText === editorSavedText ? "" : " · Modifications à enregistrer";
     body.querySelector(".app-status").textContent = `${location}${state}`;
+    body.querySelector('[data-command="paste-text"]').hidden = !editorClipboard;
     body.querySelector('[data-command="download-file"]').disabled = !file || isTrashed(file) || Boolean(state);
   }
 
@@ -2531,6 +2550,7 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     files = initialFiles();
     saveFiles();
     clipboard = null;
+    editorClipboard = "";
     draggedFile = null;
     imageSource = "cat";
     imageFile = null;
@@ -2619,6 +2639,7 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
   window.Declic = {
     open,
     reset,
+    copyEditorText,
     inspectFiles: () => files.map((file) => ({ ...file, trashed: isTrashed(file) })),
   };
 })();
@@ -2876,9 +2897,11 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     },
     {
       title: 'Écrire et enregistrer',
-      description: 'Utilise le clavier pour rédiger une phrase, puis garde une copie dans tes documents.',
+      description: 'Tape ou colle la phrase dans le Bloc-notes, puis enregistre ton document.',
+      app: 'editor',
+      sample: sampleText,
       steps: [
-        ['type', `Dans le Bloc-notes, saisis « ${sampleText} »`, 'Tiens la touche Maj enfoncée pendant que tu tapes J. Sur un clavier AZERTY, utilise la touche é pour la lettre accentuée.'],
+        ['type', 'Saisis la phrase ci-dessus dans le Bloc-notes.', 'Clique sur Copier la phrase, puis sur Coller la phrase dans le Bloc-notes. Tu peux aussi taper la phrase au clavier.'],
         ['save', `Enregistre le texte dans Documents sous « ${documentName} ».`, 'Clique sur Enregistrer et choisis Documents. Si tu l’as déjà enregistré dans un autre dossier, clique sur Enregistrer sous.'],
       ],
     },
@@ -3235,6 +3258,12 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     const openButton = app
       ? `<button class="mission-open" type="button" data-mission-app="${app}">${appLabels[app]}</button>`
       : '';
+    const sample = !passed && current.sample
+      ? `<p class="mission-sample">${escapeHtml(current.sample)}</p>`
+      : '';
+    const copyButton = sample
+      ? '<button class="mission-hint-toggle" type="button" id="mission-copy-phrase">Copier la phrase</button>'
+      : '';
     const hint = pending
       ? `<button class="mission-hint-toggle" type="button" aria-controls="mission-hint" aria-expanded="${hintOpen}">${hintOpen ? 'Masquer l’indice' : 'Afficher un indice'}</button>`
       : '';
@@ -3256,6 +3285,7 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     content.innerHTML = `
       <h2 id="mission-active-title" class="mission-card-heading" tabindex="-1">${current.title}</h2>
       <p class="mission-description">${current.description}</p>
+      ${sample}
       <ol class="mission-steps">
         ${current.steps.map(([id, description]) => {
           const done = stepDone(id);
@@ -3266,7 +3296,7 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
       </ol>
       ${completion}
       ${feedback}
-      ${openButton || hint || nextAction || verifyButton ? `<div class="mission-actions">${openButton}${hint}${verifyButton || nextAction}</div>` : ''}
+      ${openButton || copyButton || hint || nextAction || verifyButton ? `<div class="mission-actions">${openButton}${copyButton}${hint}${verifyButton || nextAction}</div>` : ''}
       ${pending ? `<p id="mission-hint" class="mission-hint"${hintOpen ? '' : ' hidden'}>${escapeHtml(stepText(pending[2]))}</p>` : ''}
       ${current.keyboard && pending ? '<p class="mission-typing-feedback" id="mission-typing-feedback" role="status" hidden></p>' : ''}`;
 
@@ -3292,6 +3322,7 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
 
   function select(index) {
     if (!missions[index] || !isAvailable(index)) return;
+    if (index !== state.active) window.Declic.copyEditorText('');
     state.active = index;
     hintOpen = false;
     challengeChecked = false;
@@ -3418,6 +3449,12 @@ a.mission-next:focus-visible { outline: 3px solid #5170ff; outline-offset: 3px; 
     if (!button) return;
     if (button.id === 'mission-verify') {
       verifyChallenge();
+    } else if (button.id === 'mission-copy-phrase') {
+      const text = missions[state.active].sample;
+      window.Declic.copyEditorText(text);
+      navigator.clipboard?.writeText?.(text)?.catch(() => {});
+      window.Declic.open('editor');
+      status.textContent = 'Phrase copiée. Clique sur Coller la phrase dans le Bloc-notes.';
     } else if (button.hasAttribute('data-mission-select')) {
       select(Number(button.dataset.missionSelect));
     } else if (button.hasAttribute('data-mission-app')) {
